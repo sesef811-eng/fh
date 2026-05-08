@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebStudio Engine | منصة إنشاء المواقع الاحترافية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { --bg: #f4f7fc; --surface: #ffffff; --text: #1e2a3e; --border: #dce5ec; --primary: #2ecc71; --primary-dark: #27ae60; --danger: #e74c3c; background: var(--bg); color: var(--text); }
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(145deg, #0f2b3d, #0a1e2c); padding: 20px; }
+        .auth-card { background: var(--surface); padding: 32px; border-radius: 40px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 35px -8px rgba(0,0,0,0.2); }
+        .auth-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 60px; border: 1px solid var(--border); background: #f9f9ff; }
+        .auth-card button { background: var(--primary); color: white; width: 100%; padding: 12px; border-radius: 60px; font-weight: bold; cursor: pointer; }
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .top-bar { background: var(--surface); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .logo { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+        .dashboard-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 280px; background: var(--surface); border-left: 1px solid var(--border); padding: 20px; overflow-y: auto; transition: 0.2s; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 32px; cursor: pointer; margin-bottom: 8px; color: #2c3e50; }
+        .nav-item:hover, .nav-item.active { background: #e8f5e9; color: var(--primary-dark); }
+        .content-area { flex: 1; overflow-y: auto; padding: 24px; }
+        .view { display: none; animation: fade 0.2s; }
+        .view.active { display: block; }
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: var(--surface); border-radius: 32px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 32px; border: 1px solid var(--border); background: var(--bg); }
+        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; }
+        .section-item { background: var(--bg); padding: 16px; border-radius: 24px; margin-bottom: 12px; }
+        .preview-link { display: inline-block; margin-top: 15px; background: var(--primary-dark); padding: 8px 16px; border-radius: 40px; color: white; text-decoration: none; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e2a3e; color: white; padding: 10px 20px; border-radius: 40px; z-index: 10000; }
+        @media (max-width: 768px) { .sidebar { position: fixed; right: -100%; top: 0; bottom: 0; z-index: 200; } .sidebar.open { right: 0; } .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; } .overlay.active { display: block; } }
+    </style>
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="authScreen" class="auth-container">
+    <div class="auth-card">
+        <i class="fas fa-cubes" style="font-size: 48px; color: var(--primary);"></i>
+        <h2>WebStudio Engine</h2>
+        <p>أنشئ موقعك باحترافية بدون برمجة</p>
+        <input type="text" id="regUsername" placeholder="اسم المستخدم" style="display: none;">
+        <input type="email" id="authEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="authPassword" placeholder="كلمة المرور">
+        <button id="actionBtn">دخول</button>
+        <div id="toggleAuthMode" style="color: var(--primary); margin-top: 15px; cursor: pointer;">جديد؟ سجل مجاناً</div>
+    </div>
+</div>
+
+<!-- لوحة التحكم -->
+<div id="dashboardContainer" style="display: none;">
+    <div class="app-wrapper">
+        <div class="top-bar">
+            <div class="logo">⚡ WebStudio</div>
+            <div><span id="userNameDisplay"></span> <button id="logoutBtn">خروج</button></div>
+        </div>
+        <div class="dashboard-layout">
+            <div class="sidebar" id="sidebar">
+                <div class="nav-item active" data-view="editor"><i class="fas fa-pen-ruler"></i> المحرر</div>
+                <div class="nav-item" data-view="sections"><i class="fas fa-layer-group"></i> الأقسام</div>
+                <div class="nav-item" data-view="products"><i class="fas fa-store"></i> المنتجات</div>
+                <div class="nav-item" data-view="settings"><i class="fas fa-cog"></i> الإعدادات</div>
+                <div class="nav-item" data-view="preview"><i class="fas fa-eye"></i> معاينة الموقع</div>
+            </div>
+            <div class="overlay" id="overlay"></div>
+            <div class="content-area">
+                <div id="editorView" class="view active">
+                    <div class="card"><h3>🎨 مظهر الموقع</h3>
+                        <label>اسم الموقع</label><input type="text" id="siteName" placeholder="اسم موقعك">
+                        <label>لون الخلفية</label><input type="color" id="themeColor" value="#f4f7fc">
+                        <label>لون الأزرار</label><input type="color" id="buttonColor" value="#2ecc71">
+                        <label>رابط الشعار (URL)</label><input type="text" id="logoUrl" placeholder="https://...">
+                        <button id="saveSiteSettings">💾 حفظ</button>
+                    </div>
+                    <div class="card"><h3>✨ القسم الترحيبي</h3>
+                        <input type="text" id="heroTitle" placeholder="العنوان الرئيسي">
+                        <textarea id="heroDesc" rows="3" placeholder="وصف قصير"></textarea>
+                        <button id="saveHero">حفظ الترحيب</button>
+                    </div>
+                </div>
+                <div id="sectionsView" class="view"><div class="card"><h3>📦 الأقسام الإضافية</h3><div id="sectionsList"></div><button id="addSectionBtn">+ إضافة قسم</button></div></div>
+                <div id="productsView" class="view"><div class="card"><h3>🛍️ المنتجات</h3><div id="productsListAdmin"></div><button id="addProductBtnAdmin">+ إضافة منتج</button></div></div>
+                <div id="settingsView" class="view"><div class="card"><h3>⚙️ حسابي</h3><button id="changePasswordBtn">تغيير كلمة المرور</button><button id="deleteAccountBtn" style="background:var(--danger);">حذف الحساب بالكامل</button></div></div>
+                <div id="previewView" class="view"><div class="card"><h3>🌐 رابط موقعك المنشور</h3><a id="publicSiteLink" class="preview-link" target="_blank">افتح موقعك</a><button id="copyLinkBtn" style="margin-top:12px;">نسخ الرابط</button></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // ========== Firebase Configuration (merged from user) ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyDNCO9GaDIIRNVFn6PVCZWrsmCbLUxUZDA",
+        authDomain: "messaging-46900.firebaseapp.com",
+        databaseURL: "https://messaging-46900-default-rtdb.firebaseio.com",
+        projectId: "messaging-46900",
+        storageBucket: "messaging-46900.firebasestorage.app",
+        messagingSenderId: "659625864102",
+        appId: "1:659625864102:web:d194ab6528b69d5b2e7d67",
+        measurementId: "G-9SVXW1QKQQ"
+    };
+    // ================================================================
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getDatabase, ref, set, push, onValue, get, remove, update } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+    function showToast(msg, isErr = false) { let t = document.createElement("div"); t.className = "toast"; t.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+
+    // حفظ البيانات
+    async function saveSiteSettings() { if (!currentUser) return; await set(ref(db, `sites/${currentUser.uid}/settings`), { siteName: document.getElementById("siteName").value, themeColor: document.getElementById("themeColor").value, buttonColor: document.getElementById("buttonColor").value, logoUrl: document.getElementById("logoUrl").value }); showToast("تم حفظ الإعدادات"); }
+    async function saveHero() { if (!currentUser) return; await set(ref(db, `sites/${currentUser.uid}/hero`), { title: document.getElementById("heroTitle").value, description: document.getElementById("heroDesc").value }); showToast("تم حفظ الترحيب"); }
+    async function loadSiteData() { if (!currentUser) return; let s = (await get(ref(db, `sites/${currentUser.uid}/settings`))).val() || {}; document.getElementById("siteName").value = s.siteName || ""; document.getElementById("themeColor").value = s.themeColor || "#f4f7fc"; document.getElementById("buttonColor").value = s.buttonColor || "#2ecc71"; document.getElementById("logoUrl").value = s.logoUrl || ""; let h = (await get(ref(db, `sites/${currentUser.uid}/hero`))).val() || {}; document.getElementById("heroTitle").value = h.title || ""; document.getElementById("heroDesc").value = h.description || ""; }
+    
+    function loadSections() { if (!currentUser) return; onValue(ref(db, `sites/${currentUser.uid}/sections`), (snap) => { let sections = snap.val() || {}; let container = document.getElementById("sectionsList"); container.innerHTML = ""; for (let [id, sec] of Object.entries(sections)) { let div = document.createElement("div"); div.className = "section-item"; div.innerHTML = `<strong>${sec.title}</strong><p>${sec.content}</p><button class="edit-sec" data-id="${id}">تعديل</button> <button class="del-sec" data-id="${id}" style="background:var(--danger);">حذف</button>`; container.appendChild(div); div.querySelector(".edit-sec").onclick = () => { let newTitle = prompt("العنوان", sec.title); let newContent = prompt("المحتوى", sec.content); if (newTitle) update(ref(db, `sites/${currentUser.uid}/sections/${id}`), { title: newTitle, content: newContent }); }; div.querySelector(".del-sec").onclick = async () => { await remove(ref(db, `sites/${currentUser.uid}/sections/${id}`)); }; } }); }
+    function loadProductsAdmin() { if (!currentUser) return; onValue(ref(db, `sites/${currentUser.uid}/products`), (snap) => { let prods = snap.val() || {}; let container = document.getElementById("productsListAdmin"); container.innerHTML = ""; for (let [id, p] of Object.entries(prods)) { let div = document.createElement("div"); div.className = "section-item"; div.innerHTML = `<strong>${p.name}</strong> - ${p.price} ₪<br>${p.desc || ""}<button class="del-prod" data-id="${id}" style="background:var(--danger);">حذف</button>`; container.appendChild(div); div.querySelector(".del-prod").onclick = async () => { await remove(ref(db, `sites/${currentUser.uid}/products/${id}`)); }; } }); }
+
+    document.getElementById("saveSiteSettings")?.addEventListener("click", saveSiteSettings);
+    document.getElementById("saveHero")?.addEventListener("click", saveHero);
+    document.getElementById("addSectionBtn")?.addEventListener("click", async () => { let title = prompt("عنوان القسم"); let content = prompt("محتوى القسم"); if(title && content) await push(ref(db, `sites/${currentUser.uid}/sections`), { title, content }); });
+    document.getElementById("addProductBtnAdmin")?.addEventListener("click", async () => { let name = prompt("اسم المنتج"); let price = prompt("السعر"); let desc = prompt("وصف"); if(name && price) await push(ref(db, `sites/${currentUser.uid}/products`), { name, price: parseFloat(price), desc, imageUrl: "" }); });
+    
+    // التنقل
+    document.querySelectorAll(".nav-item").forEach(btn => { btn.addEventListener("click", () => { let view = btn.dataset.view; document.querySelectorAll(".view").forEach(v => v.classList.remove("active")); document.getElementById(`${view}View`).classList.add("active"); document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active")); btn.classList.add("active"); if(view === "sections") loadSections(); if(view === "products") loadProductsAdmin(); if(view === "preview") { let link = `${window.location.origin}${window.location.pathname}?site=${currentUser.uid}`; document.getElementById("publicSiteLink").href = link; document.getElementById("publicSiteLink").innerText = link; } }); });
+    document.getElementById("copyLinkBtn")?.addEventListener("click", () => { let link = `${window.location.origin}${window.location.pathname}?site=${currentUser.uid}`; navigator.clipboard.writeText(link); showToast("تم نسخ الرابط"); });
+    document.getElementById("changePasswordBtn")?.addEventListener("click", async () => { let old = prompt("كلمة المرور الحالية"); let newp = prompt("كلمة المرور الجديدة"); if(old && newp && newp.length>=6) { try { await reauthenticateWithCredential(auth.currentUser, EmailAuthProvider.credential(auth.currentUser.email, old)); await updatePassword(auth.currentUser, newp); showToast("تم التغيير"); } catch(e) { showToast(e.message, true); } } });
+    document.getElementById("deleteAccountBtn")?.addEventListener("click", async () => { if(confirm("حذف الحساب والموقع نهائياً؟")) { await remove(ref(db, `sites/${currentUser.uid}`)); await auth.currentUser.delete(); showToast("تم الحذف"); location.reload(); } });
+
+    // عرض الموقع العام
+    async function renderPublicSite(userId) {
+        document.body.innerHTML = `<div style="padding:20px;min-height:100vh;" id="publicRoot"></div>`;
+        let container = document.getElementById("publicRoot");
+        let settings = (await get(ref(db, `sites/${userId}/settings`))).val() || {};
+        let hero = (await get(ref(db, `sites/${userId}/hero`))).val() || {};
+        let sectionsSnap = await get(ref(db, `sites/${userId}/sections`));
+        let productsSnap = await get(ref(db, `sites/${userId}/products`));
+        let sections = sectionsSnap.val() || {};
+        let products = productsSnap.val() || {};
+        let buttonColor = settings.buttonColor || "#2ecc71";
+        document.body.style.backgroundColor = settings.themeColor || "#f4f7fc";
+        let html = `<div style="max-width:1200px;margin:auto;"><div style="background:white;border-radius:28px;padding:20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;"><h1>${settings.siteName || "موقعي"}</h1>${settings.logoUrl ? `<img src="${settings.logoUrl}" style="height:60px;">` : ""}</div><div style="background:white;border-radius:28px;padding:30px;margin-bottom:20px;"><h2>${hero.title || "مرحباً"}</h2><p>${hero.description || ""}</p></div>`;
+        for(let sec of Object.values(sections)) html += `<div style="background:white;border-radius:28px;padding:20px;margin-bottom:16px;"><h3>${sec.title}</h3><p>${sec.content}</p></div>`;
+        if(Object.keys(products).length) { html += `<h2>🛍️ منتجاتنا</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;">`; for(let p of Object.values(products)) html += `<div style="background:white;border-radius:24px;padding:20px;"><h3>${p.name}</h3><p>${p.price} ₪</p><p>${p.desc || ""}</p><button style="background:${buttonColor};">شراء</button></div>`; html += `</div>`; }
+        html += `<footer style="margin-top:40px;text-align:center;">⚡ تم النشر بواسطة WebStudio</footer></div>`;
+        container.innerHTML = html;
+    }
+
+    // المصادقة
+    const authScreenDiv = document.getElementById("authScreen");
+    const dashboardDiv = document.getElementById("dashboardContainer");
+    let isRegister = false;
+    document.getElementById("toggleAuthMode").onclick = () => { isRegister = !isRegister; document.getElementById("regUsername").style.display = isRegister ? "block" : "none"; document.getElementById("actionBtn").innerText = isRegister ? "إنشاء حساب" : "دخول"; document.getElementById("toggleAuthMode").innerText = isRegister ? "لديك حساب؟ سجل دخول" : "جديد؟ سجل مجاناً"; };
+    document.getElementById("actionBtn").onclick = async () => { let email = document.getElementById("authEmail").value; let pass = document.getElementById("authPassword").value; if(!email||!pass) return showToast("املأ الحقول",true); if(isRegister){ let name = document.getElementById("regUsername").value; if(!name) return showToast("أدخل اسم المستخدم",true); try{ let cred = await createUserWithEmailAndPassword(auth,email,pass); await updateProfile(cred.user,{displayName:name}); await set(ref(db,`users/${cred.user.uid}`),{name,email}); await set(ref(db,`sites/${cred.user.uid}/settings`),{siteName:`موقع ${name}`,themeColor:"#f4f7fc",buttonColor:"#2ecc71",logoUrl:""}); await set(ref(db,`sites/${cred.user.uid}/hero`),{title:`أهلاً بكم في موقع ${name}`,description:"يمكنك تعديل هذا النص من لوحة التحكم"}); showToast(`مرحباً ${name}`); }catch(e){ showToast(e.message,true); } } else { try{ await signInWithEmailAndPassword(auth,email,pass); }catch(e){ showToast("بيانات غير صحيحة",true); } } };
+    onAuthStateChanged(auth, async (user) => { let urlParams = new URLSearchParams(window.location.search); let siteId = urlParams.get("site"); if(siteId && (!user || user.uid !== siteId)) { await renderPublicSite(siteId); return; } if(user){ currentUser=user; authScreenDiv.style.display="none"; dashboardDiv.style.display="flex"; document.getElementById("userNameDisplay").innerText = user.displayName; await loadSiteData(); loadSections(); loadProductsAdmin(); document.getElementById("logoutBtn").onclick = async () => { await signOut(auth); location.reload(); }; let link = `${window.location.origin}${window.location.pathname}?site=${user.uid}`; document.getElementById("publicSiteLink").href=link; document.getElementById("publicSiteLink").innerText=link; } else { if(!siteId) { authScreenDiv.style.display="flex"; dashboardDiv.style.display="none"; } } });
+    
+    // زر القائمة للجوال
+    let menuBtn = document.createElement("button"); menuBtn.innerHTML = "<i class='fas fa-bars'></i>"; menuBtn.style.cssText = "background:var(--primary);margin-left:12px;"; let topBarDiv = document.querySelector(".top-bar"); if(topBarDiv && !document.querySelector(".mobile-toggle")) { menuBtn.classList.add("mobile-toggle"); topBarDiv.prepend(menuBtn); let side = document.getElementById("sidebar"); let overlayDiv = document.getElementById("overlay"); menuBtn.onclick = () => { side.classList.toggle("open"); overlayDiv.classList.toggle("active"); }; if(overlayDiv) overlayDiv.onclick = () => { side.classList.remove("open"); overlayDiv.classList.remove("active"); }; }
+</script>
+</body>
+</html>
