@@ -2,95 +2,158 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebStudio Engine | منصة إنشاء المواقع الاحترافية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>WebStudio Pro - منشئ مواقع احترافي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { --bg: #f4f7fc; --surface: #ffffff; --text: #1e2a3e; --border: #dce5ec; --primary: #2ecc71; --primary-dark: #27ae60; --danger: #e74c3c; background: var(--bg); color: var(--text); }
-        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(145deg, #0f2b3d, #0a1e2c); padding: 20px; }
-        .auth-card { background: var(--surface); padding: 32px; border-radius: 40px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 35px -8px rgba(0,0,0,0.2); }
-        .auth-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 60px; border: 1px solid var(--border); background: #f9f9ff; }
-        .auth-card button { background: var(--primary); color: white; width: 100%; padding: 12px; border-radius: 60px; font-weight: bold; cursor: pointer; }
+        :root { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --border: #e2e8f0; --primary: #10b981; --primary-dark: #059669; --danger: #ef4444; --warning: #f59e0b; --radius: 24px; }
+        body.dark { --bg: #0f172a; --surface: #1e293b; --text: #f1f5f9; --border: #334155; }
+        body { background: var(--bg); color: var(--text); transition: background 0.2s; }
+        
+        /* Auth & Layout */
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #065f46, #064e3b); padding: 20px; }
+        .auth-card { background: var(--surface); padding: 32px; border-radius: 48px; width: 100%; max-width: 420px; text-align: center; }
+        .auth-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 80px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+        .auth-card button { background: var(--primary); width: 100%; padding: 12px; border-radius: 80px; font-weight: bold; }
+        
+        /* Dashboard Layout */
         .app-wrapper { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .top-bar { background: var(--surface); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .logo { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+        .logo { font-size: 1.6rem; font-weight: 800; color: var(--primary); cursor: pointer; }
         .dashboard-layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 280px; background: var(--surface); border-left: 1px solid var(--border); padding: 20px; overflow-y: auto; transition: 0.2s; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 32px; cursor: pointer; margin-bottom: 8px; color: #2c3e50; }
-        .nav-item:hover, .nav-item.active { background: #e8f5e9; color: var(--primary-dark); }
-        .content-area { flex: 1; overflow-y: auto; padding: 24px; }
+        .sidebar { width: 300px; background: var(--surface); border-left: 1px solid var(--border); padding: 20px; overflow-y: auto; transition: 0.2s; z-index: 10; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 40px; cursor: pointer; margin-bottom: 8px; }
+        .nav-item:hover, .nav-item.active { background: #e6f7ec; color: var(--primary-dark); }
+        body.dark .nav-item:hover, body.dark .nav-item.active { background: #2d3a4a; }
+        .content-area { flex: 1; overflow-y: auto; padding: 20px; }
         .view { display: none; animation: fade 0.2s; }
         .view.active { display: block; }
-        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--surface); border-radius: 32px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 32px; border: 1px solid var(--border); background: var(--bg); }
-        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; }
-        .section-item { background: var(--bg); padding: 16px; border-radius: 24px; margin-bottom: 12px; }
-        .preview-link { display: inline-block; margin-top: 15px; background: var(--primary-dark); padding: 8px 16px; border-radius: 40px; color: white; text-decoration: none; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e2a3e; color: white; padding: 10px 20px; border-radius: 40px; z-index: 10000; }
-        @media (max-width: 768px) { .sidebar { position: fixed; right: -100%; top: 0; bottom: 0; z-index: 200; } .sidebar.open { right: 0; } .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; } .overlay.active { display: block; } }
+        .card { background: var(--surface); border-radius: 32px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 32px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+        button { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 40px; cursor: pointer; font-weight: 600; }
+        .section-block { background: var(--bg); border-radius: 28px; padding: 16px; margin-bottom: 12px; cursor: grab; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .section-block.dragging { opacity: 0.5; }
+        .live-preview-iframe { width: 100%; height: 500px; border-radius: 28px; border: 1px solid var(--border); background: white; }
+        .template-card { display: inline-block; width: 200px; margin: 10px; padding: 12px; background: var(--bg); border-radius: 24px; cursor: pointer; text-align: center; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary-dark); color: white; padding: 10px 24px; border-radius: 40px; z-index: 9999; }
+        @media (max-width: 768px) { .sidebar { position: fixed; right: -100%; top: 0; bottom: 0; z-index: 1000; } .sidebar.open { right: 0; } .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; } .overlay.active { display: block; } }
     </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
+<!-- Auth Screen -->
 <div id="authScreen" class="auth-container">
     <div class="auth-card">
         <i class="fas fa-cubes" style="font-size: 48px; color: var(--primary);"></i>
-        <h2>WebStudio Engine</h2>
-        <p>أنشئ موقعك باحترافية بدون برمجة</p>
+        <h2>WebStudio Pro</h2>
+        <p>أنشئ موقعًا احترافيًا بسهولة مطلقة</p>
         <input type="text" id="regUsername" placeholder="اسم المستخدم" style="display: none;">
         <input type="email" id="authEmail" placeholder="البريد الإلكتروني">
         <input type="password" id="authPassword" placeholder="كلمة المرور">
         <button id="actionBtn">دخول</button>
-        <div id="toggleAuthMode" style="color: var(--primary); margin-top: 15px; cursor: pointer;">جديد؟ سجل مجاناً</div>
+        <div id="toggleAuthMode" style="margin-top: 15px; cursor: pointer; color: var(--primary);">جديد؟ سجل مجاناً</div>
     </div>
 </div>
 
-<!-- لوحة التحكم -->
+<!-- Dashboard -->
 <div id="dashboardContainer" style="display: none;">
     <div class="app-wrapper">
         <div class="top-bar">
-            <div class="logo">⚡ WebStudio</div>
-            <div><span id="userNameDisplay"></span> <button id="logoutBtn">خروج</button></div>
+            <div class="logo">⚡ WebStudio Pro</div>
+            <div><span id="userNameDisplay"></span> <button id="logoutBtn">خروج</button> <button id="darkModeToggle" style="background: #475569;">🌙</button></div>
         </div>
         <div class="dashboard-layout">
             <div class="sidebar" id="sidebar">
-                <div class="nav-item active" data-view="editor"><i class="fas fa-pen-ruler"></i> المحرر</div>
-                <div class="nav-item" data-view="sections"><i class="fas fa-layer-group"></i> الأقسام</div>
-                <div class="nav-item" data-view="products"><i class="fas fa-store"></i> المنتجات</div>
-                <div class="nav-item" data-view="settings"><i class="fas fa-cog"></i> الإعدادات</div>
-                <div class="nav-item" data-view="preview"><i class="fas fa-eye"></i> معاينة الموقع</div>
+                <div class="nav-item active" data-view="editor"><i class="fas fa-edit"></i> محرر متقدم</div>
+                <div class="nav-item" data-view="templates"><i class="fas fa-th-large"></i> قوالب جاهزة</div>
+                <div class="nav-item" data-view="pages"><i class="fas fa-folder-open"></i> إدارة الصفحات</div>
+                <div class="nav-item" data-view="seo"><i class="fas fa-chart-line"></i> تحسين SEO</div>
+                <div class="nav-item" data-view="stats"><i class="fas fa-chart-simple"></i> إحصائيات الموقع</div>
+                <div class="nav-item" data-view="export"><i class="fas fa-download"></i> تصدير HTML</div>
             </div>
             <div class="overlay" id="overlay"></div>
             <div class="content-area">
+                <!-- المحرر المتقدم -->
                 <div id="editorView" class="view active">
-                    <div class="card"><h3>🎨 مظهر الموقع</h3>
-                        <label>اسم الموقع</label><input type="text" id="siteName" placeholder="اسم موقعك">
-                        <label>لون الخلفية</label><input type="color" id="themeColor" value="#f4f7fc">
-                        <label>لون الأزرار</label><input type="color" id="buttonColor" value="#2ecc71">
-                        <label>رابط الشعار (URL)</label><input type="text" id="logoUrl" placeholder="https://...">
-                        <button id="saveSiteSettings">💾 حفظ</button>
+                    <div class="card">
+                        <h3>🎨 إعدادات عامة</h3>
+                        <label>اسم الموقع العام</label><input type="text" id="globalSiteName" placeholder="اسم الموقع">
+                        <label>شعار (رابط صورة)</label><input type="text" id="globalLogo" placeholder="https://...">
+                        <label>لون الخلفية الرئيسي</label><input type="color" id="globalBgColor" value="#f8fafc">
+                        <label>لون الأزرار</label><input type="color" id="globalBtnColor" value="#10b981">
+                        <button id="saveGlobalSettings">حفظ الإعدادات العامة</button>
                     </div>
-                    <div class="card"><h3>✨ القسم الترحيبي</h3>
-                        <input type="text" id="heroTitle" placeholder="العنوان الرئيسي">
-                        <textarea id="heroDesc" rows="3" placeholder="وصف قصير"></textarea>
-                        <button id="saveHero">حفظ الترحيب</button>
+                    <div class="card">
+                        <h3>📦 إدارة الأقسام (اسحب لترتيب)</h3>
+                        <div id="sectionsSortableList"></div>
+                        <select id="newSectionType">
+                            <option value="text">نصي</option>
+                            <option value="image">صورة</option>
+                            <option value="video">فيديو (YouTube)</option>
+                            <option value="products">منتجات</option>
+                        </select>
+                        <button id="addSectionBtn2">+ إضافة قسم</button>
+                    </div>
+                    <div class="card">
+                        <h3>👁️ معاينة حية (تظهر التغييرات فوراً)</h3>
+                        <iframe id="livePreviewFrame" class="live-preview-iframe" title="معاينة الموقع"></iframe>
+                        <button id="refreshPreview" style="margin-top:10px;">تحديث المعاينة</button>
                     </div>
                 </div>
-                <div id="sectionsView" class="view"><div class="card"><h3>📦 الأقسام الإضافية</h3><div id="sectionsList"></div><button id="addSectionBtn">+ إضافة قسم</button></div></div>
-                <div id="productsView" class="view"><div class="card"><h3>🛍️ المنتجات</h3><div id="productsListAdmin"></div><button id="addProductBtnAdmin">+ إضافة منتج</button></div></div>
-                <div id="settingsView" class="view"><div class="card"><h3>⚙️ حسابي</h3><button id="changePasswordBtn">تغيير كلمة المرور</button><button id="deleteAccountBtn" style="background:var(--danger);">حذف الحساب بالكامل</button></div></div>
-                <div id="previewView" class="view"><div class="card"><h3>🌐 رابط موقعك المنشور</h3><a id="publicSiteLink" class="preview-link" target="_blank">افتح موقعك</a><button id="copyLinkBtn" style="margin-top:12px;">نسخ الرابط</button></div></div>
+                <!-- القوالب -->
+                <div id="templatesView" class="view">
+                    <div class="card"><h3>اختر قالباً للبدء</h3>
+                        <div class="template-card" data-template="store">🛍️ متجر الكتروني</div>
+                        <div class="template-card" data-template="portfolio">🎨 بورتفوليو</div>
+                        <div class="template-card" data-template="blog">📝 مدونة شخصية</div>
+                        <button id="applyTemplateBtn">تطبيق القالب المختار</button>
+                    </div>
+                </div>
+                <!-- الصفحات -->
+                <div id="pagesView" class="view">
+                    <div class="card"><h3>صفحات الموقع (متعدد)</h3>
+                        <div id="pagesList"></div>
+                        <input type="text" id="newPageName" placeholder="اسم الصفحة الجديدة"><button id="addPageBtn">إضافة صفحة</button>
+                    </div>
+                </div>
+                <!-- SEO -->
+                <div id="seoView" class="view">
+                    <div class="card"><h3>معلومات SEO للصفحة الرئيسية</h3>
+                        <label>عنوان المتصفح (Title)</label><input type="text" id="seoTitle" placeholder="عنوان الموقع">
+                        <label>الوصف (Meta Description)</label><textarea id="seoDesc" rows="2"></textarea>
+                        <button id="saveSeoBtn">حفظ SEO</button>
+                    </div>
+                </div>
+                <!-- إحصائيات -->
+                <div id="statsView" class="view">
+                    <div class="card"><h3>إحصائيات وهمية (لتحفيزك)</h3>
+                        <p>👥 زوار اليوم: <span id="fakeVisitors">1,247</span></p>
+                        <p>📄 مشاهدات الصفحات: <span id="fakePageviews">8,932</span></p>
+                        <p>⭐ تفاعل: 76%</p>
+                    </div>
+                </div>
+                <!-- تصدير -->
+                <div id="exportView" class="view">
+                    <div class="card"><h3>📥 تصدير موقعك كملف HTML</h3>
+                        <button id="exportSiteBtn">تحميل الموقع كامل (HTML)</button>
+                        <p>سيتم إنشاء ملف واحد يمكنك رفعه على أي استضافة.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script type="module">
-    // ========== Firebase Configuration (merged from user) ==========
+    // Firebase Config (من المستخدم)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getDatabase, ref, set, push, onValue, get, remove, update, child } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+    
     const firebaseConfig = {
         apiKey: "AIzaSyDNCO9GaDIIRNVFn6PVCZWrsmCbLUxUZDA",
         authDomain: "messaging-46900.firebaseapp.com",
@@ -98,70 +161,241 @@
         projectId: "messaging-46900",
         storageBucket: "messaging-46900.firebasestorage.app",
         messagingSenderId: "659625864102",
-        appId: "1:659625864102:web:d194ab6528b69d5b2e7d67",
-        measurementId: "G-9SVXW1QKQQ"
+        appId: "1:659625864102:web:d194ab6528b69d5b2e7d67"
     };
-    // ================================================================
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, get, remove, update } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-
+    
     let currentUser = null;
-    function showToast(msg, isErr = false) { let t = document.createElement("div"); t.className = "toast"; t.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
-
-    // حفظ البيانات
-    async function saveSiteSettings() { if (!currentUser) return; await set(ref(db, `sites/${currentUser.uid}/settings`), { siteName: document.getElementById("siteName").value, themeColor: document.getElementById("themeColor").value, buttonColor: document.getElementById("buttonColor").value, logoUrl: document.getElementById("logoUrl").value }); showToast("تم حفظ الإعدادات"); }
-    async function saveHero() { if (!currentUser) return; await set(ref(db, `sites/${currentUser.uid}/hero`), { title: document.getElementById("heroTitle").value, description: document.getElementById("heroDesc").value }); showToast("تم حفظ الترحيب"); }
-    async function loadSiteData() { if (!currentUser) return; let s = (await get(ref(db, `sites/${currentUser.uid}/settings`))).val() || {}; document.getElementById("siteName").value = s.siteName || ""; document.getElementById("themeColor").value = s.themeColor || "#f4f7fc"; document.getElementById("buttonColor").value = s.buttonColor || "#2ecc71"; document.getElementById("logoUrl").value = s.logoUrl || ""; let h = (await get(ref(db, `sites/${currentUser.uid}/hero`))).val() || {}; document.getElementById("heroTitle").value = h.title || ""; document.getElementById("heroDesc").value = h.description || ""; }
+    let sortableInstance = null;
+    let currentSections = [];
     
-    function loadSections() { if (!currentUser) return; onValue(ref(db, `sites/${currentUser.uid}/sections`), (snap) => { let sections = snap.val() || {}; let container = document.getElementById("sectionsList"); container.innerHTML = ""; for (let [id, sec] of Object.entries(sections)) { let div = document.createElement("div"); div.className = "section-item"; div.innerHTML = `<strong>${sec.title}</strong><p>${sec.content}</p><button class="edit-sec" data-id="${id}">تعديل</button> <button class="del-sec" data-id="${id}" style="background:var(--danger);">حذف</button>`; container.appendChild(div); div.querySelector(".edit-sec").onclick = () => { let newTitle = prompt("العنوان", sec.title); let newContent = prompt("المحتوى", sec.content); if (newTitle) update(ref(db, `sites/${currentUser.uid}/sections/${id}`), { title: newTitle, content: newContent }); }; div.querySelector(".del-sec").onclick = async () => { await remove(ref(db, `sites/${currentUser.uid}/sections/${id}`)); }; } }); }
-    function loadProductsAdmin() { if (!currentUser) return; onValue(ref(db, `sites/${currentUser.uid}/products`), (snap) => { let prods = snap.val() || {}; let container = document.getElementById("productsListAdmin"); container.innerHTML = ""; for (let [id, p] of Object.entries(prods)) { let div = document.createElement("div"); div.className = "section-item"; div.innerHTML = `<strong>${p.name}</strong> - ${p.price} ₪<br>${p.desc || ""}<button class="del-prod" data-id="${id}" style="background:var(--danger);">حذف</button>`; container.appendChild(div); div.querySelector(".del-prod").onclick = async () => { await remove(ref(db, `sites/${currentUser.uid}/products/${id}`)); }; } }); }
-
-    document.getElementById("saveSiteSettings")?.addEventListener("click", saveSiteSettings);
-    document.getElementById("saveHero")?.addEventListener("click", saveHero);
-    document.getElementById("addSectionBtn")?.addEventListener("click", async () => { let title = prompt("عنوان القسم"); let content = prompt("محتوى القسم"); if(title && content) await push(ref(db, `sites/${currentUser.uid}/sections`), { title, content }); });
-    document.getElementById("addProductBtnAdmin")?.addEventListener("click", async () => { let name = prompt("اسم المنتج"); let price = prompt("السعر"); let desc = prompt("وصف"); if(name && price) await push(ref(db, `sites/${currentUser.uid}/products`), { name, price: parseFloat(price), desc, imageUrl: "" }); });
+    function showToast(msg) { let t=document.createElement("div"); t.className="toast"; t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
     
-    // التنقل
-    document.querySelectorAll(".nav-item").forEach(btn => { btn.addEventListener("click", () => { let view = btn.dataset.view; document.querySelectorAll(".view").forEach(v => v.classList.remove("active")); document.getElementById(`${view}View`).classList.add("active"); document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active")); btn.classList.add("active"); if(view === "sections") loadSections(); if(view === "products") loadProductsAdmin(); if(view === "preview") { let link = `${window.location.origin}${window.location.pathname}?site=${currentUser.uid}`; document.getElementById("publicSiteLink").href = link; document.getElementById("publicSiteLink").innerText = link; } }); });
-    document.getElementById("copyLinkBtn")?.addEventListener("click", () => { let link = `${window.location.origin}${window.location.pathname}?site=${currentUser.uid}`; navigator.clipboard.writeText(link); showToast("تم نسخ الرابط"); });
-    document.getElementById("changePasswordBtn")?.addEventListener("click", async () => { let old = prompt("كلمة المرور الحالية"); let newp = prompt("كلمة المرور الجديدة"); if(old && newp && newp.length>=6) { try { await reauthenticateWithCredential(auth.currentUser, EmailAuthProvider.credential(auth.currentUser.email, old)); await updatePassword(auth.currentUser, newp); showToast("تم التغيير"); } catch(e) { showToast(e.message, true); } } });
-    document.getElementById("deleteAccountBtn")?.addEventListener("click", async () => { if(confirm("حذف الحساب والموقع نهائياً؟")) { await remove(ref(db, `sites/${currentUser.uid}`)); await auth.currentUser.delete(); showToast("تم الحذف"); location.reload(); } });
-
-    // عرض الموقع العام
-    async function renderPublicSite(userId) {
-        document.body.innerHTML = `<div style="padding:20px;min-height:100vh;" id="publicRoot"></div>`;
-        let container = document.getElementById("publicRoot");
-        let settings = (await get(ref(db, `sites/${userId}/settings`))).val() || {};
-        let hero = (await get(ref(db, `sites/${userId}/hero`))).val() || {};
-        let sectionsSnap = await get(ref(db, `sites/${userId}/sections`));
-        let productsSnap = await get(ref(db, `sites/${userId}/products`));
-        let sections = sectionsSnap.val() || {};
-        let products = productsSnap.val() || {};
-        let buttonColor = settings.buttonColor || "#2ecc71";
-        document.body.style.backgroundColor = settings.themeColor || "#f4f7fc";
-        let html = `<div style="max-width:1200px;margin:auto;"><div style="background:white;border-radius:28px;padding:20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;"><h1>${settings.siteName || "موقعي"}</h1>${settings.logoUrl ? `<img src="${settings.logoUrl}" style="height:60px;">` : ""}</div><div style="background:white;border-radius:28px;padding:30px;margin-bottom:20px;"><h2>${hero.title || "مرحباً"}</h2><p>${hero.description || ""}</p></div>`;
-        for(let sec of Object.values(sections)) html += `<div style="background:white;border-radius:28px;padding:20px;margin-bottom:16px;"><h3>${sec.title}</h3><p>${sec.content}</p></div>`;
-        if(Object.keys(products).length) { html += `<h2>🛍️ منتجاتنا</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;">`; for(let p of Object.values(products)) html += `<div style="background:white;border-radius:24px;padding:20px;"><h3>${p.name}</h3><p>${p.price} ₪</p><p>${p.desc || ""}</p><button style="background:${buttonColor};">شراء</button></div>`; html += `</div>`; }
-        html += `<footer style="margin-top:40px;text-align:center;">⚡ تم النشر بواسطة WebStudio</footer></div>`;
-        container.innerHTML = html;
+    // ========== حفظ وقراءة بيانات الموقع المتقدمة ==========
+    async function saveGlobalSettings() {
+        if(!currentUser) return;
+        let siteData = {
+            name: document.getElementById("globalSiteName").value,
+            logo: document.getElementById("globalLogo").value,
+            bgColor: document.getElementById("globalBgColor").value,
+            btnColor: document.getElementById("globalBtnColor").value,
+            sections: currentSections,
+            seo: { title: document.getElementById("seoTitle").value, desc: document.getElementById("seoDesc").value }
+        };
+        await set(ref(db, `sites/${currentUser.uid}/fullData`), siteData);
+        showToast("تم حفظ كل شيء");
+        updateLivePreview();
     }
-
+    
+    async function loadFullSiteData() {
+        if(!currentUser) return;
+        let snap = await get(ref(db, `sites/${currentUser.uid}/fullData`));
+        let data = snap.val() || {};
+        document.getElementById("globalSiteName").value = data.name || "موقعي الجديد";
+        document.getElementById("globalLogo").value = data.logo || "";
+        document.getElementById("globalBgColor").value = data.bgColor || "#f8fafc";
+        document.getElementById("globalBtnColor").value = data.btnColor || "#10b981";
+        document.getElementById("seoTitle").value = data.seo?.title || "";
+        document.getElementById("seoDesc").value = data.seo?.desc || "";
+        currentSections = data.sections || [];
+        renderSectionsList();
+        updateLivePreview();
+    }
+    
+    function renderSectionsList() {
+        let container = document.getElementById("sectionsSortableList");
+        if(!container) return;
+        container.innerHTML = "";
+        currentSections.forEach((sec, idx) => {
+            let div = document.createElement("div");
+            div.className = "section-block";
+            div.setAttribute("data-id", idx);
+            div.innerHTML = `<div><i class="fas fa-grip-vertical"></i> <strong>${sec.type}</strong> - ${sec.title || "بدون عنوان"}</div>
+                            <div><button class="editSecBtn" data-idx="${idx}">✏️</button> <button class="delSecBtn" data-idx="${idx}">🗑️</button></div>`;
+            container.appendChild(div);
+        });
+        if(sortableInstance) sortableInstance.destroy();
+        sortableInstance = new Sortable(container, {
+            animation: 200,
+            onEnd: async () => {
+                let newOrder = [];
+                document.querySelectorAll("#sectionsSortableList .section-block").forEach(el => {
+                    let idx = parseInt(el.getAttribute("data-id"));
+                    newOrder.push(currentSections[idx]);
+                });
+                currentSections = newOrder;
+                await saveGlobalSettings();
+            }
+        });
+        // أحداث التعديل والحذف
+        document.querySelectorAll(".editSecBtn").forEach(btn => {
+            btn.onclick = async (e) => {
+                let idx = parseInt(btn.dataset.idx);
+                let sec = currentSections[idx];
+                let newTitle = prompt("عنوان القسم", sec.title || "");
+                let newContent = prompt("المحتوى (نص أو رابط صورة/فيديو)", sec.content || "");
+                if(newTitle !== null) { sec.title = newTitle; sec.content = newContent; }
+                await saveGlobalSettings();
+                renderSectionsList();
+            };
+        });
+        document.querySelectorAll(".delSecBtn").forEach(btn => {
+            btn.onclick = async () => {
+                let idx = parseInt(btn.dataset.idx);
+                currentSections.splice(idx,1);
+                await saveGlobalSettings();
+                renderSectionsList();
+            };
+        });
+    }
+    
+    document.getElementById("addSectionBtn2")?.addEventListener("click", async () => {
+        let type = document.getElementById("newSectionType").value;
+        let title = prompt("عنوان القسم (اختياري)");
+        let content = prompt("المحتوى (نص / رابط صورة / رابط فيديو YouTube)");
+        if(content) {
+            currentSections.push({ type, title: title || `قسم ${type}`, content });
+            await saveGlobalSettings();
+            renderSectionsList();
+        }
+    });
+    
+    // تحديث المعاينة الحية
+    async function updateLivePreview() {
+        let iframe = document.getElementById("livePreviewFrame");
+        if(!iframe) return;
+        let siteData = {
+            name: document.getElementById("globalSiteName").value,
+            logo: document.getElementById("globalLogo").value,
+            bgColor: document.getElementById("globalBgColor").value,
+            btnColor: document.getElementById("globalBtnColor").value,
+            sections: currentSections,
+            seo: { title: document.getElementById("seoTitle").value, desc: document.getElementById("seoDesc").value }
+        };
+        let html = generateWebsiteHTML(siteData, currentUser?.uid || "demo");
+        let blob = new Blob([html], {type: "text/html"});
+        let url = URL.createObjectURL(blob);
+        iframe.src = url;
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    
+    function generateWebsiteHTML(data, userId) {
+        let sectionsHtml = "";
+        for(let sec of data.sections) {
+            if(sec.type === "text") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px; margin-bottom:20px;"><h3>${sec.title || ""}</h3><p>${sec.content}</p></div>`;
+            else if(sec.type === "image") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px; margin-bottom:20px;"><h3>${sec.title || ""}</h3><img src="${sec.content}" style="max-width:100%; border-radius:24px;"></div>`;
+            else if(sec.type === "video") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px; margin-bottom:20px;"><h3>${sec.title || ""}</h3><iframe width="100%" height="315" src="${sec.content.replace("watch?v=","embed/")}" frameborder="0"></iframe></div>`;
+            else if(sec.type === "products") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px;"><h3>${sec.title || "منتجاتنا"}</h3><p>${sec.content} (يمكن عرض منتجات حقيقية لاحقاً)</p></div>`;
+        }
+        return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${data.seo?.title || data.name}</title><meta name="description" content="${data.seo?.desc || ""}"><style>body{font-family: 'Cairo',sans-serif; margin:0; padding:20px; background:${data.bgColor}; color:#1e293b;} .container{max-width:1200px; margin:auto;} button{background:${data.btnColor}; border:none; padding:8px 20px; border-radius:40px; color:white;}</style></head><body><div class="container"><div style="display:flex; justify-content:space-between; align-items:center;"><h1>${data.name}</h1>${data.logo ? `<img src="${data.logo}" style="height:60px;">` : ""}</div>${sectionsHtml}<footer style="margin-top:40px; text-align:center;">⚡ تم إنشاؤه بواسطة WebStudio Pro</footer></div></body></html>`;
+    }
+    
+    document.getElementById("saveGlobalSettings")?.addEventListener("click", saveGlobalSettings);
+    document.getElementById("refreshPreview")?.addEventListener("click", updateLivePreview);
+    
+    // تطبيق القوالب
+    let selectedTemplate = "store";
+    document.querySelectorAll(".template-card").forEach(card => {
+        card.onclick = () => { selectedTemplate = card.dataset.template; showToast(`تم اختيار قالب ${card.innerText}`); };
+    });
+    document.getElementById("applyTemplateBtn")?.addEventListener("click", async () => {
+        let templateSections = [];
+        if(selectedTemplate === "store") templateSections = [{type:"text", title:"مرحباً بمتجرنا", content:"أفضل العروض"},{type:"products", title:"منتجات مميزة", content:"هاتف - 500₪"}];
+        else if(selectedTemplate === "portfolio") templateSections = [{type:"image", title:"معرض أعمالي", content:"https://picsum.photos/400/200"},{type:"text", title:"نبذة عني", content:"مصمم جرافيك"}];
+        else templateSections = [{type:"text", title:"آخر المقالات", content":"تدوينة جديدة"},{type:"video", title:"فيديو تعريفي", content:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}];
+        currentSections = templateSections;
+        await saveGlobalSettings();
+        renderSectionsList();
+        showToast("تم تطبيق القالب");
+    });
+    
+    // الصفحات المتعددة (نظام بسيط)
+    let pages = [];
+    async function loadPages() { if(!currentUser) return; let snap = await get(ref(db, `sites/${currentUser.uid}/pages`)); pages = snap.val() || ["الرئيسية"]; renderPagesList(); }
+    function renderPagesList() { let container = document.getElementById("pagesList"); if(!container) return; container.innerHTML = pages.map((p,i)=>`<div class="section-block">${p}<button class="delPage" data-idx="${i}">حذف</button></div>`).join(''); document.querySelectorAll(".delPage").forEach(btn=>{ btn.onclick = async (e)=>{ let idx=parseInt(btn.dataset.idx); pages.splice(idx,1); await set(ref(db,`sites/${currentUser.uid}/pages`),pages); loadPages(); }; }); }
+    document.getElementById("addPageBtn")?.addEventListener("click", async () => { let name = document.getElementById("newPageName").value; if(name) { pages.push(name); await set(ref(db,`sites/${currentUser.uid}/pages`),pages); loadPages(); document.getElementById("newPageName").value=""; showToast("تمت إضافة صفحة"); } });
+    
+    // تصدير الموقع
+    document.getElementById("exportSiteBtn")?.addEventListener("click", async () => {
+        let siteData = (await get(ref(db, `sites/${currentUser.uid}/fullData`))).val() || {};
+        let html = generateWebsiteHTML(siteData, currentUser.uid);
+        let blob = new Blob([html], {type: "text/html"});
+        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "my_site.html"; link.click(); URL.revokeObjectURL(link.href);
+        showToast("تم تصدير الموقع");
+    });
+    
+    // إحصائيات وهمية
+    function updateFakeStats() { document.getElementById("fakeVisitors").innerText = Math.floor(1000+Math.random()*500); document.getElementById("fakePageviews").innerText = Math.floor(8000+Math.random()*3000); }
+    setInterval(updateFakeStats, 15000);
+    
+    // تفعيل الوضع الليلي
+    document.getElementById("darkModeToggle")?.addEventListener("click", () => { document.body.classList.toggle("dark"); });
+    
+    // التنقل بين التبويبات
+    document.querySelectorAll(".nav-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+            let view = btn.dataset.view;
+            document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+            document.getElementById(`${view}View`).classList.add("active");
+            document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+            btn.classList.add("active");
+            if(view === "pages") loadPages();
+            if(view === "stats") updateFakeStats();
+        });
+    });
+    
     // المصادقة
     const authScreenDiv = document.getElementById("authScreen");
     const dashboardDiv = document.getElementById("dashboardContainer");
     let isRegister = false;
-    document.getElementById("toggleAuthMode").onclick = () => { isRegister = !isRegister; document.getElementById("regUsername").style.display = isRegister ? "block" : "none"; document.getElementById("actionBtn").innerText = isRegister ? "إنشاء حساب" : "دخول"; document.getElementById("toggleAuthMode").innerText = isRegister ? "لديك حساب؟ سجل دخول" : "جديد؟ سجل مجاناً"; };
-    document.getElementById("actionBtn").onclick = async () => { let email = document.getElementById("authEmail").value; let pass = document.getElementById("authPassword").value; if(!email||!pass) return showToast("املأ الحقول",true); if(isRegister){ let name = document.getElementById("regUsername").value; if(!name) return showToast("أدخل اسم المستخدم",true); try{ let cred = await createUserWithEmailAndPassword(auth,email,pass); await updateProfile(cred.user,{displayName:name}); await set(ref(db,`users/${cred.user.uid}`),{name,email}); await set(ref(db,`sites/${cred.user.uid}/settings`),{siteName:`موقع ${name}`,themeColor:"#f4f7fc",buttonColor:"#2ecc71",logoUrl:""}); await set(ref(db,`sites/${cred.user.uid}/hero`),{title:`أهلاً بكم في موقع ${name}`,description:"يمكنك تعديل هذا النص من لوحة التحكم"}); showToast(`مرحباً ${name}`); }catch(e){ showToast(e.message,true); } } else { try{ await signInWithEmailAndPassword(auth,email,pass); }catch(e){ showToast("بيانات غير صحيحة",true); } } };
-    onAuthStateChanged(auth, async (user) => { let urlParams = new URLSearchParams(window.location.search); let siteId = urlParams.get("site"); if(siteId && (!user || user.uid !== siteId)) { await renderPublicSite(siteId); return; } if(user){ currentUser=user; authScreenDiv.style.display="none"; dashboardDiv.style.display="flex"; document.getElementById("userNameDisplay").innerText = user.displayName; await loadSiteData(); loadSections(); loadProductsAdmin(); document.getElementById("logoutBtn").onclick = async () => { await signOut(auth); location.reload(); }; let link = `${window.location.origin}${window.location.pathname}?site=${user.uid}`; document.getElementById("publicSiteLink").href=link; document.getElementById("publicSiteLink").innerText=link; } else { if(!siteId) { authScreenDiv.style.display="flex"; dashboardDiv.style.display="none"; } } });
+    document.getElementById("toggleAuthMode").onclick = () => { isRegister=!isRegister; document.getElementById("regUsername").style.display = isRegister?"block":"none"; document.getElementById("actionBtn").innerText = isRegister?"إنشاء حساب":"دخول"; };
+    document.getElementById("actionBtn").onclick = async () => {
+        let email = document.getElementById("authEmail").value;
+        let pass = document.getElementById("authPassword").value;
+        if(!email||!pass) return showToast("املأ الحقول");
+        if(isRegister){
+            let name = document.getElementById("regUsername").value;
+            if(!name) return showToast("أدخل اسم المستخدم");
+            try{
+                let cred = await createUserWithEmailAndPassword(auth,email,pass);
+                await updateProfile(cred.user,{displayName:name});
+                await set(ref(db,`users/${cred.user.uid}`),{name,email});
+                // بيانات افتراضية
+                let demoData = { name:`موقع ${name}`, logo:"", bgColor:"#f8fafc", btnColor:"#10b981", sections:[{type:"text", title:"مرحباً", content:"ابدأ بتعديل موقعك"}], seo:{title:"موقعي", desc:""} };
+                await set(ref(db,`sites/${cred.user.uid}/fullData`), demoData);
+                await set(ref(db,`sites/${cred.user.uid}/pages`), ["الرئيسية"]);
+                showToast(`مرحباً ${name}`);
+            } catch(e){ showToast(e.message); }
+        } else {
+            try{ await signInWithEmailAndPassword(auth,email,pass); } catch(e){ showToast("بيانات غير صحيحة"); }
+        }
+    };
+    onAuthStateChanged(auth, async (user) => {
+        let urlParams = new URLSearchParams(window.location.search);
+        let siteId = urlParams.get("site");
+        if(siteId && (!user || user.uid !== siteId)) { /* عرض الموقع العام */
+            let snap = await get(ref(db, `sites/${siteId}/fullData`));
+            let data = snap.val() || {};
+            document.body.innerHTML = generateWebsiteHTML(data, siteId);
+            return;
+        }
+        if(user){
+            currentUser = user;
+            authScreenDiv.style.display = "none";
+            dashboardDiv.style.display = "flex";
+            document.getElementById("userNameDisplay").innerText = user.displayName;
+            await loadFullSiteData();
+            loadPages();
+            document.getElementById("logoutBtn").onclick = async () => { await signOut(auth); location.reload(); };
+        } else {
+            if(!window.location.search.includes("site")) { authScreenDiv.style.display="flex"; dashboardDiv.style.display="none"; }
+        }
+    });
     
     // زر القائمة للجوال
-    let menuBtn = document.createElement("button"); menuBtn.innerHTML = "<i class='fas fa-bars'></i>"; menuBtn.style.cssText = "background:var(--primary);margin-left:12px;"; let topBarDiv = document.querySelector(".top-bar"); if(topBarDiv && !document.querySelector(".mobile-toggle")) { menuBtn.classList.add("mobile-toggle"); topBarDiv.prepend(menuBtn); let side = document.getElementById("sidebar"); let overlayDiv = document.getElementById("overlay"); menuBtn.onclick = () => { side.classList.toggle("open"); overlayDiv.classList.toggle("active"); }; if(overlayDiv) overlayDiv.onclick = () => { side.classList.remove("open"); overlayDiv.classList.remove("active"); }; }
+    let menuBtn = document.createElement("button"); menuBtn.innerHTML = "<i class='fas fa-bars'></i>"; menuBtn.style.cssText = "background:var(--primary); margin-left:12px;"; let topBarDiv=document.querySelector(".top-bar"); if(topBarDiv && !document.querySelector(".mobile-toggle")){ menuBtn.classList.add("mobile-toggle"); topBarDiv.prepend(menuBtn); let side=document.getElementById("sidebar"); let overlayDiv=document.getElementById("overlay"); menuBtn.onclick=()=>{ side.classList.toggle("open"); overlayDiv.classList.toggle("active"); }; if(overlayDiv) overlayDiv.onclick=()=>{ side.classList.remove("open"); overlayDiv.classList.remove("active"); }; }
 </script>
 </body>
 </html>
