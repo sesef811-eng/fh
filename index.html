@@ -3,156 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>WebStudio Pro - منشئ مواقع احترافي</title>
+    <title>WebStudio Engine | منصة متكاملة لبناء المواقع - جميع الطبقات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        :root { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --border: #e2e8f0; --primary: #10b981; --primary-dark: #059669; --danger: #ef4444; --warning: #f59e0b; --radius: 24px; }
-        body.dark { --bg: #0f172a; --surface: #1e293b; --text: #f1f5f9; --border: #334155; }
-        body { background: var(--bg); color: var(--text); transition: background 0.2s; }
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --text: #1a2634;
+            --text-light: #5a6874;
+            --border: #e2e8f0;
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --sidebar-width: 300px;
+            --inspector-width: 300px;
+            --toolbar-height: 60px;
+        }
+        body { background: var(--bg); color: var(--text); overflow: hidden; font-size: 16px; }
         
-        /* Auth & Layout */
-        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #065f46, #064e3b); padding: 20px; }
-        .auth-card { background: var(--surface); padding: 32px; border-radius: 48px; width: 100%; max-width: 420px; text-align: center; }
-        .auth-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 80px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
-        .auth-card button { background: var(--primary); width: 100%; padding: 12px; border-radius: 80px; font-weight: bold; }
+        /* شاشة تسجيل الدخول */
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0b2b26, #1a4a3a); padding: 20px; }
+        .auth-card { background: var(--surface); border-radius: 48px; padding: 40px 32px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 30px 50px -20px rgba(0,0,0,0.3); }
+        .auth-card h2 { font-size: 28px; margin-bottom: 8px; background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .auth-card input { width: 100%; padding: 14px 18px; margin: 12px 0; border-radius: 60px; border: 1px solid var(--border); font-size: 16px; transition: 0.2s; }
+        .auth-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .auth-card button { background: var(--primary); color: white; width: 100%; padding: 14px; border-radius: 60px; font-weight: 700; font-size: 16px; cursor: pointer; border: none; transition: 0.2s; }
+        .auth-card button:hover { background: var(--primary-dark); transform: scale(0.98); }
+        .toggle-auth { color: var(--primary); margin-top: 20px; cursor: pointer; font-weight: 600; }
         
-        /* Dashboard Layout */
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .top-bar { background: var(--surface); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .logo { font-size: 1.6rem; font-weight: 800; color: var(--primary); cursor: pointer; }
-        .dashboard-layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 300px; background: var(--surface); border-left: 1px solid var(--border); padding: 20px; overflow-y: auto; transition: 0.2s; z-index: 10; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 40px; cursor: pointer; margin-bottom: 8px; }
-        .nav-item:hover, .nav-item.active { background: #e6f7ec; color: var(--primary-dark); }
-        body.dark .nav-item:hover, body.dark .nav-item.active { background: #2d3a4a; }
-        .content-area { flex: 1; overflow-y: auto; padding: 20px; }
-        .view { display: none; animation: fade 0.2s; }
-        .view.active { display: block; }
-        .card { background: var(--surface); border-radius: 32px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 32px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
-        button { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 40px; cursor: pointer; font-weight: 600; }
-        .section-block { background: var(--bg); border-radius: 28px; padding: 16px; margin-bottom: 12px; cursor: grab; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .section-block.dragging { opacity: 0.5; }
-        .live-preview-iframe { width: 100%; height: 500px; border-radius: 28px; border: 1px solid var(--border); background: white; }
-        .template-card { display: inline-block; width: 200px; margin: 10px; padding: 12px; background: var(--bg); border-radius: 24px; cursor: pointer; text-align: center; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary-dark); color: white; padding: 10px 24px; border-radius: 40px; z-index: 9999; }
-        @media (max-width: 768px) { .sidebar { position: fixed; right: -100%; top: 0; bottom: 0; z-index: 1000; } .sidebar.open { right: 0; } .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; } .overlay.active { display: block; } }
+        /* لوحة التحكم الرئيسية */
+        .dashboard { display: none; flex-direction: column; height: 100vh; overflow: hidden; }
+        .toolbar { background: var(--surface); height: var(--toolbar-height); display: flex; justify-content: space-between; align-items: center; padding: 0 24px; border-bottom: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .toolbar-actions { display: flex; gap: 12px; }
+        .toolbar-btn { background: transparent; border: 1px solid var(--border); padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .toolbar-btn-primary { background: var(--primary); border: none; color: white; }
+        .toolbar-btn-primary:hover { background: var(--primary-dark); }
+        .user-info { display: flex; align-items: center; gap: 16px; }
+        
+        .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
+        
+        /* اللوحة الجانبية (القائمة الشجرية للمكونات) */
+        .structure-panel { width: var(--sidebar-width); background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; transition: transform 0.3s ease; z-index: 20; }
+        .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 800; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); }
+        .category-group { margin-bottom: 24px; }
+        .category-title { font-weight: 700; padding: 8px 12px; background: var(--bg); border-radius: 16px; margin: 8px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .components-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; }
+        .component-chip { background: var(--bg); border-radius: 40px; padding: 8px 14px; font-size: 13px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+        .component-chip:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+        
+        /* منطقة المعاينة (Canvas) */
+        .canvas { flex: 1; overflow-y: auto; padding: 24px; background: #eef2f6; }
+        .site-preview { max-width: 1200px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15); overflow: hidden; transition: all 0.2s; }
+        .component-item { position: relative; margin-bottom: 20px; border: 2px solid transparent; border-radius: 24px; transition: 0.1s; cursor: pointer; }
+        .component-item.selected { border-color: var(--primary); background: #f0fdf4; }
+        .delete-component { position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; border-radius: 30px; padding: 4px 12px; font-size: 12px; cursor: pointer; z-index: 10; display: none; font-weight: bold; }
+        .component-item:hover .delete-component { display: block; }
+        
+        /* لوحة الخصائص */
+        .inspector-panel { width: var(--inspector-width); background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; transition: transform 0.3s ease; z-index: 20; }
+        .inspector-field { margin-bottom: 18px; }
+        .inspector-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-light); }
+        .inspector-field input, .inspector-field select, .inspector-field textarea { width: 100%; padding: 10px 14px; border-radius: 16px; border: 1px solid var(--border); font-size: 14px; }
+        
+        /* عناصر إضافية (ثري دي، فيديو) */
+        .three-canvas { width: 100%; height: 280px; background: #111; border-radius: 24px; }
+        .glass-effect { backdrop-filter: blur(12px); background: rgba(255,255,255,0.2); border-radius: 32px; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 60px; z-index: 2000; font-size: 14px; animation: fadeUp 0.3s ease; }
+        
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* استجابة الجوال */
+        @media (max-width: 768px) {
+            .structure-panel { position: fixed; right: -100%; top: var(--toolbar-height); bottom: 0; z-index: 150; box-shadow: -5px 0 20px rgba(0,0,0,0.1); }
+            .structure-panel.open { right: 0; }
+            .inspector-panel { position: fixed; left: -100%; top: var(--toolbar-height); bottom: 0; z-index: 150; }
+            .inspector-panel.open { left: 0; }
+            .mobile-menu-btn { display: block; }
+            .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 140; }
+            .overlay.active { display: block; }
+        }
+        .mobile-menu-btn { display: none; background: var(--primary); border: none; padding: 8px 12px; border-radius: 12px; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<!-- Auth Screen -->
+<!-- شاشة المصادقة -->
 <div id="authScreen" class="auth-container">
     <div class="auth-card">
-        <i class="fas fa-cubes" style="font-size: 48px; color: var(--primary);"></i>
-        <h2>WebStudio Pro</h2>
-        <p>أنشئ موقعًا احترافيًا بسهولة مطلقة</p>
-        <input type="text" id="regUsername" placeholder="اسم المستخدم" style="display: none;">
-        <input type="email" id="authEmail" placeholder="البريد الإلكتروني">
-        <input type="password" id="authPassword" placeholder="كلمة المرور">
-        <button id="actionBtn">دخول</button>
-        <div id="toggleAuthMode" style="margin-top: 15px; cursor: pointer; color: var(--primary);">جديد؟ سجل مجاناً</div>
+        <i class="fas fa-cube" style="font-size: 56px; color: #10b981;"></i>
+        <h2>WebStudio Engine</h2>
+        <p style="color: #5a6874;">أنشئ مواقع احترافية بكل الطبقات مجاناً</p>
+        <input type="text" id="regName" placeholder="الاسم" style="display: none;">
+        <input type="email" id="authEmail" placeholder="البريد الإلكتروني" autocomplete="email">
+        <input type="password" id="authPassword" placeholder="كلمة المرور" autocomplete="current-password">
+        <button id="authActionBtn">دخول</button>
+        <div class="toggle-auth" id="toggleAuthMode">✨ جديد؟ سجل مجاناً</div>
     </div>
 </div>
 
-<!-- Dashboard -->
-<div id="dashboardContainer" style="display: none;">
-    <div class="app-wrapper">
-        <div class="top-bar">
+<!-- واجهة البناء الرئيسية -->
+<div id="dashboard" class="dashboard">
+    <div class="toolbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             <div class="logo">⚡ WebStudio Pro</div>
-            <div><span id="userNameDisplay"></span> <button id="logoutBtn">خروج</button> <button id="darkModeToggle" style="background: #475569;">🌙</button></div>
         </div>
-        <div class="dashboard-layout">
-            <div class="sidebar" id="sidebar">
-                <div class="nav-item active" data-view="editor"><i class="fas fa-edit"></i> محرر متقدم</div>
-                <div class="nav-item" data-view="templates"><i class="fas fa-th-large"></i> قوالب جاهزة</div>
-                <div class="nav-item" data-view="pages"><i class="fas fa-folder-open"></i> إدارة الصفحات</div>
-                <div class="nav-item" data-view="seo"><i class="fas fa-chart-line"></i> تحسين SEO</div>
-                <div class="nav-item" data-view="stats"><i class="fas fa-chart-simple"></i> إحصائيات الموقع</div>
-                <div class="nav-item" data-view="export"><i class="fas fa-download"></i> تصدير HTML</div>
+        <div class="toolbar-actions">
+            <button class="toolbar-btn" id="undoBtn"><i class="fas fa-undo"></i> تراجع</button>
+            <button class="toolbar-btn" id="redoBtn"><i class="fas fa-redo"></i> إعادة</button>
+            <button class="toolbar-btn toolbar-btn-primary" id="publishBtn"><i class="fas fa-globe"></i> نشر</button>
+            <button class="toolbar-btn" id="previewBtn"><i class="fas fa-eye"></i> معاينة</button>
+        </div>
+        <div class="user-info">
+            <span id="userNameDisplay"></span>
+            <button class="toolbar-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+    <div class="main-layout">
+        <div class="overlay" id="overlay"></div>
+        
+        <!-- اللوحة اليمنى: جميع المكونات وفق الطبقات (UI/MEDIA/INTERACTION/DATA/ADVANCED) -->
+        <div class="structure-panel" id="structurePanel">
+            <div class="panel-header">
+                <span><i class="fas fa-layer-group"></i> مكتبة الطبقات</span>
+                <button id="closeStructBtn" style="background:none; border:none; font-size: 20px;"><i class="fas fa-times"></i></button>
             </div>
-            <div class="overlay" id="overlay"></div>
-            <div class="content-area">
-                <!-- المحرر المتقدم -->
-                <div id="editorView" class="view active">
-                    <div class="card">
-                        <h3>🎨 إعدادات عامة</h3>
-                        <label>اسم الموقع العام</label><input type="text" id="globalSiteName" placeholder="اسم الموقع">
-                        <label>شعار (رابط صورة)</label><input type="text" id="globalLogo" placeholder="https://...">
-                        <label>لون الخلفية الرئيسي</label><input type="color" id="globalBgColor" value="#f8fafc">
-                        <label>لون الأزرار</label><input type="color" id="globalBtnColor" value="#10b981">
-                        <button id="saveGlobalSettings">حفظ الإعدادات العامة</button>
-                    </div>
-                    <div class="card">
-                        <h3>📦 إدارة الأقسام (اسحب لترتيب)</h3>
-                        <div id="sectionsSortableList"></div>
-                        <select id="newSectionType">
-                            <option value="text">نصي</option>
-                            <option value="image">صورة</option>
-                            <option value="video">فيديو (YouTube)</option>
-                            <option value="products">منتجات</option>
-                        </select>
-                        <button id="addSectionBtn2">+ إضافة قسم</button>
-                    </div>
-                    <div class="card">
-                        <h3>👁️ معاينة حية (تظهر التغييرات فوراً)</h3>
-                        <iframe id="livePreviewFrame" class="live-preview-iframe" title="معاينة الموقع"></iframe>
-                        <button id="refreshPreview" style="margin-top:10px;">تحديث المعاينة</button>
-                    </div>
-                </div>
-                <!-- القوالب -->
-                <div id="templatesView" class="view">
-                    <div class="card"><h3>اختر قالباً للبدء</h3>
-                        <div class="template-card" data-template="store">🛍️ متجر الكتروني</div>
-                        <div class="template-card" data-template="portfolio">🎨 بورتفوليو</div>
-                        <div class="template-card" data-template="blog">📝 مدونة شخصية</div>
-                        <button id="applyTemplateBtn">تطبيق القالب المختار</button>
-                    </div>
-                </div>
-                <!-- الصفحات -->
-                <div id="pagesView" class="view">
-                    <div class="card"><h3>صفحات الموقع (متعدد)</h3>
-                        <div id="pagesList"></div>
-                        <input type="text" id="newPageName" placeholder="اسم الصفحة الجديدة"><button id="addPageBtn">إضافة صفحة</button>
-                    </div>
-                </div>
-                <!-- SEO -->
-                <div id="seoView" class="view">
-                    <div class="card"><h3>معلومات SEO للصفحة الرئيسية</h3>
-                        <label>عنوان المتصفح (Title)</label><input type="text" id="seoTitle" placeholder="عنوان الموقع">
-                        <label>الوصف (Meta Description)</label><textarea id="seoDesc" rows="2"></textarea>
-                        <button id="saveSeoBtn">حفظ SEO</button>
-                    </div>
-                </div>
-                <!-- إحصائيات -->
-                <div id="statsView" class="view">
-                    <div class="card"><h3>إحصائيات وهمية (لتحفيزك)</h3>
-                        <p>👥 زوار اليوم: <span id="fakeVisitors">1,247</span></p>
-                        <p>📄 مشاهدات الصفحات: <span id="fakePageviews">8,932</span></p>
-                        <p>⭐ تفاعل: 76%</p>
-                    </div>
-                </div>
-                <!-- تصدير -->
-                <div id="exportView" class="view">
-                    <div class="card"><h3>📥 تصدير موقعك كملف HTML</h3>
-                        <button id="exportSiteBtn">تحميل الموقع كامل (HTML)</button>
-                        <p>سيتم إنشاء ملف واحد يمكنك رفعه على أي استضافة.</p>
-                    </div>
-                </div>
-            </div>
+            <div id="layersContainer" style="padding: 12px;"></div>
+        </div>
+        
+        <!-- المساحة الرئيسية (Canvas) -->
+        <div class="canvas" id="canvas">
+            <div class="site-preview" id="sitePreview"></div>
+        </div>
+        
+        <!-- لوحة الخصائص -->
+        <div class="inspector-panel" id="inspectorPanel">
+            <h4 style="margin-bottom: 16px;"><i class="fas fa-sliders-h"></i> خصائص العنصر</h4>
+            <div id="inspectorContent">اختر أي عنصر في الموقع لتعديل خصائصه</div>
         </div>
     </div>
 </div>
 
 <script type="module">
-    // Firebase Config (من المستخدم)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, get, remove, update, child } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyDNCO9GaDIIRNVFn6PVCZWrsmCbLUxUZDA",
@@ -163,239 +163,293 @@
         messagingSenderId: "659625864102",
         appId: "1:659625864102:web:d194ab6528b69d5b2e7d67"
     };
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
     
     let currentUser = null;
-    let sortableInstance = null;
-    let currentSections = [];
+    let siteComponents = []; // كل عناصر الموقع { id, type, props }
+    let selectedCompId = null;
+    let historyStack = [];
+    let historyIndex = -1;
     
-    function showToast(msg) { let t=document.createElement("div"); t.className="toast"; t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+    // تعريف جميع المكونات حسب الطبقات (UI, Media, Interaction, Data, Advanced)
+    const COMPONENTS_LIB = {
+        "واجهات UI": [
+            { type: "hero", name: "🏠 الترحيب (Hero)", defaultProps: { title: "مرحباً بكم في موقعي", desc: "أفضل تجربة رقمية", btnText: "ابدأ الآن", btnLink: "#" } },
+            { type: "modernBtn", name: "✨ زر نيون/زجاجي", defaultProps: { text: "زر تفاعلي", style: "neon", link: "#" } },
+            { type: "navbar", name: "🧭 شريط تنقل ذكي", defaultProps: { logo: "شعارك", items: "الرئيسية,خدمات,اتصل بنا" } },
+            { type: "card", name: "💳 بطاقة منتج", defaultProps: { title: "منتج مميز", desc: "وصف رائع", price: "99", image: "https://picsum.photos/300/200" } },
+            { type: "modal", name: "🪟 نافذة منبثقة", defaultProps: { buttonText: "فتح النافذة", modalContent: "محتوى النافذة الحديثة" } },
+            { type: "slider", name: "🎠 سلايدر صور", defaultProps: { images: "https://picsum.photos/800/400?1,https://picsum.photos/800/400?2,https://picsum.photos/800/400?3" } }
+        ],
+        "وسائط Media": [
+            { type: "gallery", name: "🖼️ معرض صور (Masonry)", defaultProps: { images: "https://picsum.photos/300/200?1,https://picsum.photos/300/200?2,https://picsum.photos/300/200?3" } },
+            { type: "video", name: "🎬 مشغل فيديو", defaultProps: { videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", autoplay: false } },
+            { type: "audio", name: "🎵 مشغل صوتي", defaultProps: { audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" } },
+            { type: "threeD", name: "🧊 عارض 3D (Three.js)", defaultProps: { modelType: "cube" } },
+            { type: "canvasAnim", name: "✨ كانفاس متحرك", defaultProps: { animation: "particles" } }
+        ],
+        "تفاعل Interaction": [
+            { type: "hoverCard", name: "✨ بطاقة مؤثر hover", defaultProps: { content: "حرك المؤشر هنا", effect: "glow" } },
+            { type: "scrollReveal", name: "📜 أنيميشن سكرول", defaultProps: { title: "عنوان يظهر عند التمرير", animation: "fadeUp" } },
+            { type: "parallax", name: "🌄 بارالاكس خلفية", defaultProps: { title: "خلفية متحركة", bgImage: "https://picsum.photos/id/104/1200/600" } },
+            { type: "cursorFx", name: "🖱️ تأثير مؤشر فاخر", defaultProps: { effect: "glowTrail" } }
+        ],
+        "بيانات Data": [
+            { type: "form", name: "📝 نموذج اتصال", defaultProps: { fields: "الاسم,البريد,الرسالة" } },
+            { type: "liveChat", name: "💬 دردشة مباشرة (Realtime)", defaultProps: { room: "general" } },
+            { type: "comments", name: "🗣️ نظام تعليقات", defaultProps: { postId: "post1" } },
+            { type: "dashboard", name: "📊 لوحة إحصائيات", defaultProps: { visitors: "1250", sales: "5.2K", revenue: "12.8K" } }
+        ],
+        "أنظمة متقدمة": [
+            { type: "aiBot", name: "🤖 مساعد ذكاء اصطناعي (محاكي)", defaultProps: { botName: "مساعد WebStudio" } },
+            { type: "fileUpload", name: "📂 رفع ملفات سحابي", defaultProps: { accept: "image/*" } },
+            { type: "cms", name: "📰 نظام إدارة محتوى (مدونة)", defaultProps: { postsCount: "3" } },
+            { type: "realtimeCounter", name: "🔢 عداد مباشر (Live)", defaultProps: { count: 0 } }
+        ]
+    };
     
-    // ========== حفظ وقراءة بيانات الموقع المتقدمة ==========
-    async function saveGlobalSettings() {
-        if(!currentUser) return;
-        let siteData = {
-            name: document.getElementById("globalSiteName").value,
-            logo: document.getElementById("globalLogo").value,
-            bgColor: document.getElementById("globalBgColor").value,
-            btnColor: document.getElementById("globalBtnColor").value,
-            sections: currentSections,
-            seo: { title: document.getElementById("seoTitle").value, desc: document.getElementById("seoDesc").value }
-        };
-        await set(ref(db, `sites/${currentUser.uid}/fullData`), siteData);
-        showToast("تم حفظ كل شيء");
-        updateLivePreview();
+    // دالة عرض الإشعارات
+    function showToast(msg, isErr = false) {
+        let toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2800);
     }
     
-    async function loadFullSiteData() {
-        if(!currentUser) return;
-        let snap = await get(ref(db, `sites/${currentUser.uid}/fullData`));
-        let data = snap.val() || {};
-        document.getElementById("globalSiteName").value = data.name || "موقعي الجديد";
-        document.getElementById("globalLogo").value = data.logo || "";
-        document.getElementById("globalBgColor").value = data.bgColor || "#f8fafc";
-        document.getElementById("globalBtnColor").value = data.btnColor || "#10b981";
-        document.getElementById("seoTitle").value = data.seo?.title || "";
-        document.getElementById("seoDesc").value = data.seo?.desc || "";
-        currentSections = data.sections || [];
-        renderSectionsList();
-        updateLivePreview();
+    // حفظ التاريخ
+    function pushToHistory() {
+        historyStack = historyStack.slice(0, historyIndex + 1);
+        historyStack.push(JSON.parse(JSON.stringify(siteComponents)));
+        historyIndex++;
+        if (historyStack.length > 50) historyStack.shift();
+    }
+    function undo() { if (historyIndex > 0) { historyIndex--; siteComponents = JSON.parse(JSON.stringify(historyStack[historyIndex])); renderCanvas(); saveToFirebase(); showToast("تم التراجع"); } }
+    function redo() { if (historyIndex < historyStack.length - 1) { historyIndex++; siteComponents = JSON.parse(JSON.stringify(historyStack[historyIndex])); renderCanvas(); saveToFirebase(); showToast("تم الإعادة"); } }
+    
+    async function saveToFirebase() {
+        if (!currentUser) return;
+        await set(ref(db, `sites/${currentUser.uid}/components`), siteComponents);
     }
     
-    function renderSectionsList() {
-        let container = document.getElementById("sectionsSortableList");
-        if(!container) return;
+    async function loadFromFirebase() {
+        if (!currentUser) return;
+        const snapshot = await get(ref(db, `sites/${currentUser.uid}/components`));
+        let comps = snapshot.val();
+        if (comps && Array.isArray(comps)) siteComponents = comps;
+        else siteComponents = [];
+        if (siteComponents.length === 0) addExampleComponents();
+        renderCanvas();
+        pushToHistory();
+    }
+    
+    function addExampleComponents() {
+        siteComponents = [
+            { id: Date.now().toString(), type: "hero", props: { title: "مرحباً بك في WebStudio Pro", desc: "منصة متكاملة بكل الطبقات", btnText: "استكشف", btnLink: "#" } },
+            { id: (Date.now()+1).toString(), type: "card", props: { title: "منتج احترافي", desc: "جودة عالية", price: "199", image: "https://picsum.photos/300/200" } }
+        ];
+    }
+    
+    // إضافة مكون جديد
+    function addComponent(compDef) {
+        const newId = Date.now() + "-" + Math.random().toString(36).substr(2, 6);
+        const newComp = { id: newId, type: compDef.type, props: JSON.parse(JSON.stringify(compDef.defaultProps)) };
+        siteComponents.push(newComp);
+        renderCanvas();
+        saveToFirebase();
+        pushToHistory();
+        showToast(`✅ تم إضافة ${compDef.name}`);
+    }
+    
+    // حذف مكون
+    function deleteComponent(id) {
+        siteComponents = siteComponents.filter(c => c.id !== id);
+        if (selectedCompId === id) selectedCompId = null;
+        renderCanvas();
+        saveToFirebase();
+        pushToHistory();
+        showToast("🗑️ تم الحذف");
+    }
+    
+    // عرض قائمة الطبقات في اللوحة الجانبية
+    function renderLayersPanel() {
+        const container = document.getElementById("layersContainer");
         container.innerHTML = "";
-        currentSections.forEach((sec, idx) => {
-            let div = document.createElement("div");
-            div.className = "section-block";
-            div.setAttribute("data-id", idx);
-            div.innerHTML = `<div><i class="fas fa-grip-vertical"></i> <strong>${sec.type}</strong> - ${sec.title || "بدون عنوان"}</div>
-                            <div><button class="editSecBtn" data-idx="${idx}">✏️</button> <button class="delSecBtn" data-idx="${idx}">🗑️</button></div>`;
-            container.appendChild(div);
-        });
-        if(sortableInstance) sortableInstance.destroy();
-        sortableInstance = new Sortable(container, {
-            animation: 200,
-            onEnd: async () => {
-                let newOrder = [];
-                document.querySelectorAll("#sectionsSortableList .section-block").forEach(el => {
-                    let idx = parseInt(el.getAttribute("data-id"));
-                    newOrder.push(currentSections[idx]);
-                });
-                currentSections = newOrder;
-                await saveGlobalSettings();
-            }
-        });
-        // أحداث التعديل والحذف
-        document.querySelectorAll(".editSecBtn").forEach(btn => {
-            btn.onclick = async (e) => {
-                let idx = parseInt(btn.dataset.idx);
-                let sec = currentSections[idx];
-                let newTitle = prompt("عنوان القسم", sec.title || "");
-                let newContent = prompt("المحتوى (نص أو رابط صورة/فيديو)", sec.content || "");
-                if(newTitle !== null) { sec.title = newTitle; sec.content = newContent; }
-                await saveGlobalSettings();
-                renderSectionsList();
+        for (const [category, items] of Object.entries(COMPONENTS_LIB)) {
+            const catDiv = document.createElement("div");
+            catDiv.className = "category-group";
+            catDiv.innerHTML = `<div class="category-title"><span>📂 ${category}</span> <i class="fas fa-chevron-down"></i></div><div class="components-list" id="list-${category.replace(/\s/g,'')}"></div>`;
+            container.appendChild(catDiv);
+            const listDiv = catDiv.querySelector(".components-list");
+            items.forEach(item => {
+                const chip = document.createElement("div");
+                chip.className = "component-chip";
+                chip.innerHTML = `<i class="fas fa-plus-circle"></i> ${item.name}`;
+                chip.onclick = () => addComponent(item);
+                listDiv.appendChild(chip);
+            });
+            // تصغير/توسيع الأقسام
+            const titleDiv = catDiv.querySelector(".category-title");
+            titleDiv.onclick = () => {
+                const list = titleDiv.nextElementSibling;
+                list.style.display = list.style.display === "none" ? "flex" : "none";
             };
-        });
-        document.querySelectorAll(".delSecBtn").forEach(btn => {
-            btn.onclick = async () => {
-                let idx = parseInt(btn.dataset.idx);
-                currentSections.splice(idx,1);
-                await saveGlobalSettings();
-                renderSectionsList();
-            };
-        });
-    }
-    
-    document.getElementById("addSectionBtn2")?.addEventListener("click", async () => {
-        let type = document.getElementById("newSectionType").value;
-        let title = prompt("عنوان القسم (اختياري)");
-        let content = prompt("المحتوى (نص / رابط صورة / رابط فيديو YouTube)");
-        if(content) {
-            currentSections.push({ type, title: title || `قسم ${type}`, content });
-            await saveGlobalSettings();
-            renderSectionsList();
         }
-    });
-    
-    // تحديث المعاينة الحية
-    async function updateLivePreview() {
-        let iframe = document.getElementById("livePreviewFrame");
-        if(!iframe) return;
-        let siteData = {
-            name: document.getElementById("globalSiteName").value,
-            logo: document.getElementById("globalLogo").value,
-            bgColor: document.getElementById("globalBgColor").value,
-            btnColor: document.getElementById("globalBtnColor").value,
-            sections: currentSections,
-            seo: { title: document.getElementById("seoTitle").value, desc: document.getElementById("seoDesc").value }
-        };
-        let html = generateWebsiteHTML(siteData, currentUser?.uid || "demo");
-        let blob = new Blob([html], {type: "text/html"});
-        let url = URL.createObjectURL(blob);
-        iframe.src = url;
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
     
-    function generateWebsiteHTML(data, userId) {
-        let sectionsHtml = "";
-        for(let sec of data.sections) {
-            if(sec.type === "text") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px; margin-bottom:20px;"><h3>${sec.title || ""}</h3><p>${sec.content}</p></div>`;
-            else if(sec.type === "image") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px; margin-bottom:20px;"><h3>${sec.title || ""}</h3><img src="${sec.content}" style="max-width:100%; border-radius:24px;"></div>`;
-            else if(sec.type === "video") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px; margin-bottom:20px;"><h3>${sec.title || ""}</h3><iframe width="100%" height="315" src="${sec.content.replace("watch?v=","embed/")}" frameborder="0"></iframe></div>`;
-            else if(sec.type === "products") sectionsHtml += `<div style="background:white; border-radius:28px; padding:20px;"><h3>${sec.title || "منتجاتنا"}</h3><p>${sec.content} (يمكن عرض منتجات حقيقية لاحقاً)</p></div>`;
+    // دالة لعرض مكونات معينة بناءً على النوع والخصائص
+    function renderComponent(comp, primaryColor = "#10b981") {
+        const p = comp.props;
+        switch (comp.type) {
+            case "hero": return `<div style="text-align:center; padding:60px 20px; background:linear-gradient(135deg, ${primaryColor}15, white); border-radius:32px;"><h1 style="color:${primaryColor}; font-size:2.2rem;">${p.title}</h1><p style="margin:12px 0;">${p.desc}</p><a href="${p.btnLink}" style="background:${primaryColor}; color:white; padding:12px 30px; border-radius:60px; text-decoration:none; display:inline-block;">${p.btnText}</a></div>`;
+            case "modernBtn": return `<a href="${p.link}" style="display:inline-block; padding:12px 32px; border-radius:60px; background:${p.style === 'neon' ? primaryColor : 'rgba(255,255,255,0.2)'}; backdrop-filter:blur(8px); box-shadow:0 0 10px ${primaryColor}; color:white; text-decoration:none;">${p.text}</a>`;
+            case "navbar": return `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background:rgba(255,255,255,0.9); backdrop-filter:blur(12px); border-radius:60px;"><strong style="color:${primaryColor};">${p.logo}</strong><div style="display:flex; gap:20px;">${p.items.split(',').map(i => `<span>${i.trim()}</span>`).join('')}</div></div>`;
+            case "card": return `<div style="background:white; border-radius:28px; padding:20px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.05); text-align:center;"><img src="${p.image}" style="width:100%; border-radius:20px; height:160px; object-fit:cover;"><h3 style="margin:12px 0 6px;">${p.title}</h3><p>${p.desc}</p><strong style="color:${primaryColor};">${p.price} ₪</strong><br><button style="background:${primaryColor}; border:none; border-radius:40px; padding:8px 24px; margin-top:12px; color:white;">شراء</button></div>`;
+            case "modal": return `<div><button id="modalBtn-${comp.id}" style="background:${primaryColor}; border:none; padding:10px 20px; border-radius:40px; color:white;">${p.buttonText}</button><div id="modalContent-${comp.id}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); justify-content:center; align-items:center; z-index:1000;"><div style="background:white; border-radius:32px; padding:30px; max-width:400px;">${p.modalContent}<button onclick="document.getElementById('modalContent-${comp.id}').style.display='none'">إغلاق</button></div></div><script>document.getElementById('modalBtn-${comp.id}')?.addEventListener('click',()=>document.getElementById('modalContent-${comp.id}').style.display='flex');<\/script></div>`;
+            case "slider": const imgs = p.images.split(','); return `<div style="display:flex; overflow-x:auto; gap:16px; padding:8px;">${imgs.map(src => `<img src="${src}" style="min-width:260px; height:180px; object-fit:cover; border-radius:24px;">`).join('')}</div>`;
+            case "gallery": const gallery = p.images.split(','); return `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;">${gallery.map(img => `<img src="${img}" style="width:100%; border-radius:20px; transition:0.2s; cursor:pointer;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">`).join('')}</div>`;
+            case "video": return `<video controls width="100%" style="border-radius:24px;" ${p.autoplay ? 'autoplay' : ''}><source src="${p.videoUrl}"></video>`;
+            case "audio": return `<audio controls src="${p.audioUrl}" style="width:100%;"></audio>`;
+            case "threeD": return `<div id="three-${comp.id}" class="three-canvas"></div><script>setTimeout(()=>{ const container=document.getElementById('three-${comp.id}'); if(container && !container.hasChildNodes()){ const scene=new THREE.Scene(); const camera=new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight,0.1,1000); const renderer=new THREE.WebGLRenderer(); renderer.setSize(container.clientWidth, container.clientHeight); container.appendChild(renderer.domElement); const geometry=new THREE.BoxGeometry(); const material=new THREE.MeshStandardMaterial({color:0x10b981}); const cube=new THREE.Mesh(geometry,material); scene.add(cube); const light=new THREE.DirectionalLight(0xffffff,1); light.position.set(1,2,3); scene.add(light); camera.position.z=3; function animate(){ requestAnimationFrame(animate); cube.rotation.x+=0.01; cube.rotation.y+=0.012; renderer.render(scene,camera); } animate(); } },100);<\/script>`;
+            case "hoverCard": return `<div style="padding:40px; text-align:center; background:#f0fdf4; border-radius:32px; transition:0.3s; cursor:pointer;" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 0 20px ${primaryColor}'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='none'">${p.content}</div>`;
+            case "scrollReveal": return `<div class="reveal-on-scroll" style="padding:50px; background:${primaryColor}15; border-radius:32px; opacity:0; transform:translateY(30px); transition:0.6s;">${p.title}</div><script>const observer=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.style.opacity=1; e.target.style.transform='translateY(0)'; } }); }); document.querySelectorAll('.reveal-on-scroll').forEach(el=>observer.observe(el));<\/script>`;
+            case "form": return `<form style="display:flex; flex-direction:column; gap:12px;"><input placeholder="الاسم"><input placeholder="البريد"><textarea placeholder="الرسالة"></textarea><button style="background:${primaryColor}; border:none; padding:10px; border-radius:40px; color:white;">إرسال</button></form>`;
+            case "liveChat": return `<div id="chat-${comp.id}" style="background:#f1f5f9; border-radius:24px; padding:12px; height:250px; overflow-y:auto;"><div>💬 مرحباً! دردشة تجريبية حية</div><input id="chatInput-${comp.id}" placeholder="اكتب رسالة..."><button onclick="alert('تم إرسال رسالة تجريبية')">إرسال</button></div>`;
+            case "dashboard": return `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;"><div style="background:#10b98120; border-radius:28px; padding:20px; text-align:center;"><h3>👥 زوار</h3><span style="font-size:28px;">${p.visitors}</span></div><div style="background:#10b98120; border-radius:28px; padding:20px;"><h3>💰 مبيعات</h3><span>${p.sales}</span></div><div><h3>📈 إيرادات</h3><span>${p.revenue}</span></div></div>`;
+            case "aiBot": return `<div style="background:#1e293b; border-radius:28px; color:white; padding:16px;"><div id="botMsgs-${comp.id}">🤖 مساعد: كيف يمكنني مساعدتك؟</div><input id="botInput-${comp.id}" placeholder="اكتب سؤالك"><button onclick="document.getElementById('botMsgs-${comp.id}').innerHTML+='<div>🗣️ أنت: '+document.getElementById('botInput-${comp.id}').value+'</div><div>🤖 رد تجريبي: شكراً لتواصلك</div>'">اسأل</button></div>`;
+            case "fileUpload": return `<input type="file" id="file-${comp.id}"><button onclick="alert('تم رفع الملف تجريبياً (سحابة Firebase)')">رفع</button><div>يمكنك إضافة صور عبر رابط في الخصائص</div>`;
+            default: return `<div style="background:#e2e8f0; border-radius:24px; padding:40px; text-align:center;">عنصر مخصص: ${comp.type}</div>`;
         }
-        return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${data.seo?.title || data.name}</title><meta name="description" content="${data.seo?.desc || ""}"><style>body{font-family: 'Cairo',sans-serif; margin:0; padding:20px; background:${data.bgColor}; color:#1e293b;} .container{max-width:1200px; margin:auto;} button{background:${data.btnColor}; border:none; padding:8px 20px; border-radius:40px; color:white;}</style></head><body><div class="container"><div style="display:flex; justify-content:space-between; align-items:center;"><h1>${data.name}</h1>${data.logo ? `<img src="${data.logo}" style="height:60px;">` : ""}</div>${sectionsHtml}<footer style="margin-top:40px; text-align:center;">⚡ تم إنشاؤه بواسطة WebStudio Pro</footer></div></body></html>`;
     }
     
-    document.getElementById("saveGlobalSettings")?.addEventListener("click", saveGlobalSettings);
-    document.getElementById("refreshPreview")?.addEventListener("click", updateLivePreview);
-    
-    // تطبيق القوالب
-    let selectedTemplate = "store";
-    document.querySelectorAll(".template-card").forEach(card => {
-        card.onclick = () => { selectedTemplate = card.dataset.template; showToast(`تم اختيار قالب ${card.innerText}`); };
-    });
-    document.getElementById("applyTemplateBtn")?.addEventListener("click", async () => {
-        let templateSections = [];
-        if(selectedTemplate === "store") templateSections = [{type:"text", title:"مرحباً بمتجرنا", content:"أفضل العروض"},{type:"products", title:"منتجات مميزة", content:"هاتف - 500₪"}];
-        else if(selectedTemplate === "portfolio") templateSections = [{type:"image", title:"معرض أعمالي", content:"https://picsum.photos/400/200"},{type:"text", title:"نبذة عني", content:"مصمم جرافيك"}];
-        else templateSections = [{type:"text", title:"آخر المقالات", content":"تدوينة جديدة"},{type:"video", title:"فيديو تعريفي", content:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}];
-        currentSections = templateSections;
-        await saveGlobalSettings();
-        renderSectionsList();
-        showToast("تم تطبيق القالب");
-    });
-    
-    // الصفحات المتعددة (نظام بسيط)
-    let pages = [];
-    async function loadPages() { if(!currentUser) return; let snap = await get(ref(db, `sites/${currentUser.uid}/pages`)); pages = snap.val() || ["الرئيسية"]; renderPagesList(); }
-    function renderPagesList() { let container = document.getElementById("pagesList"); if(!container) return; container.innerHTML = pages.map((p,i)=>`<div class="section-block">${p}<button class="delPage" data-idx="${i}">حذف</button></div>`).join(''); document.querySelectorAll(".delPage").forEach(btn=>{ btn.onclick = async (e)=>{ let idx=parseInt(btn.dataset.idx); pages.splice(idx,1); await set(ref(db,`sites/${currentUser.uid}/pages`),pages); loadPages(); }; }); }
-    document.getElementById("addPageBtn")?.addEventListener("click", async () => { let name = document.getElementById("newPageName").value; if(name) { pages.push(name); await set(ref(db,`sites/${currentUser.uid}/pages`),pages); loadPages(); document.getElementById("newPageName").value=""; showToast("تمت إضافة صفحة"); } });
-    
-    // تصدير الموقع
-    document.getElementById("exportSiteBtn")?.addEventListener("click", async () => {
-        let siteData = (await get(ref(db, `sites/${currentUser.uid}/fullData`))).val() || {};
-        let html = generateWebsiteHTML(siteData, currentUser.uid);
-        let blob = new Blob([html], {type: "text/html"});
-        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "my_site.html"; link.click(); URL.revokeObjectURL(link.href);
-        showToast("تم تصدير الموقع");
-    });
-    
-    // إحصائيات وهمية
-    function updateFakeStats() { document.getElementById("fakeVisitors").innerText = Math.floor(1000+Math.random()*500); document.getElementById("fakePageviews").innerText = Math.floor(8000+Math.random()*3000); }
-    setInterval(updateFakeStats, 15000);
-    
-    // تفعيل الوضع الليلي
-    document.getElementById("darkModeToggle")?.addEventListener("click", () => { document.body.classList.toggle("dark"); });
-    
-    // التنقل بين التبويبات
-    document.querySelectorAll(".nav-item").forEach(btn => {
-        btn.addEventListener("click", () => {
-            let view = btn.dataset.view;
-            document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-            document.getElementById(`${view}View`).classList.add("active");
-            document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-            btn.classList.add("active");
-            if(view === "pages") loadPages();
-            if(view === "stats") updateFakeStats();
+    // عرض جميع المكونات في المعاينة
+    function renderCanvas() {
+        const previewDiv = document.getElementById("sitePreview");
+        const primaryColor = "#10b981";
+        let html = `<div style="padding:24px;"><div style="margin-bottom:20px; text-align:center;"><span style="font-size:26px; font-weight:800; color:${primaryColor}">⚡ معاينة موقعك</span><p>انقر على أي عنصر لتعديل خصائصه</p></div>`;
+        for (let comp of siteComponents) {
+            html += `<div class="component-item" data-id="${comp.id}" data-type="${comp.type}"><div class="delete-component" data-id="${comp.id}"><i class="fas fa-trash"></i> حذف</div>${renderComponent(comp, primaryColor)}</div>`;
+        }
+        html += `</div>`;
+        previewDiv.innerHTML = html;
+        
+        // إضافة أحداث التحديد والحذف
+        document.querySelectorAll('.component-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-component')) return;
+                const id = el.dataset.id;
+                selectedCompId = id;
+                document.querySelectorAll('.component-item').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                renderInspector();
+            });
+            const delBtn = el.querySelector('.delete-component');
+            if (delBtn) delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteComponent(delBtn.dataset.id); });
         });
-    });
+    }
     
-    // المصادقة
-    const authScreenDiv = document.getElementById("authScreen");
-    const dashboardDiv = document.getElementById("dashboardContainer");
-    let isRegister = false;
-    document.getElementById("toggleAuthMode").onclick = () => { isRegister=!isRegister; document.getElementById("regUsername").style.display = isRegister?"block":"none"; document.getElementById("actionBtn").innerText = isRegister?"إنشاء حساب":"دخول"; };
-    document.getElementById("actionBtn").onclick = async () => {
-        let email = document.getElementById("authEmail").value;
-        let pass = document.getElementById("authPassword").value;
-        if(!email||!pass) return showToast("املأ الحقول");
-        if(isRegister){
-            let name = document.getElementById("regUsername").value;
-            if(!name) return showToast("أدخل اسم المستخدم");
-            try{
-                let cred = await createUserWithEmailAndPassword(auth,email,pass);
-                await updateProfile(cred.user,{displayName:name});
-                await set(ref(db,`users/${cred.user.uid}`),{name,email});
-                // بيانات افتراضية
-                let demoData = { name:`موقع ${name}`, logo:"", bgColor:"#f8fafc", btnColor:"#10b981", sections:[{type:"text", title:"مرحباً", content:"ابدأ بتعديل موقعك"}], seo:{title:"موقعي", desc:""} };
-                await set(ref(db,`sites/${cred.user.uid}/fullData`), demoData);
-                await set(ref(db,`sites/${cred.user.uid}/pages`), ["الرئيسية"]);
-                showToast(`مرحباً ${name}`);
-            } catch(e){ showToast(e.message); }
+    // عرض لوحة الخصائص للعنصر المحدد
+    function renderInspector() {
+        const container = document.getElementById("inspectorContent");
+        if (!selectedCompId) { container.innerHTML = "<p>✏️ اختر عنصراً من المعاينة لتعديل خصائصه</p>"; return; }
+        const comp = siteComponents.find(c => c.id === selectedCompId);
+        if (!comp) return;
+        let html = `<h5 style="margin-bottom:12px;">تعديل: ${comp.type}</h5>`;
+        for (let [key, val] of Object.entries(comp.props)) {
+            html += `<div class="inspector-field"><label>${key}</label><input type="text" data-prop="${key}" value="${val}"></div>`;
+        }
+        container.innerHTML = html;
+        document.querySelectorAll('#inspectorContent input').forEach(inp => {
+            inp.addEventListener('change', (e) => {
+                const prop = inp.dataset.prop;
+                comp.props[prop] = inp.value;
+                renderCanvas();
+                saveToFirebase();
+                pushToHistory();
+            });
+        });
+    }
+    
+    // ========== نظام المصادقة ==========
+    let isRegisterMode = false;
+    const authActionBtn = document.getElementById("authActionBtn");
+    const toggleAuth = document.getElementById("toggleAuthMode");
+    const regNameField = document.getElementById("regName");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    
+    toggleAuth.onclick = () => {
+        isRegisterMode = !isRegisterMode;
+        regNameField.style.display = isRegisterMode ? "block" : "none";
+        authActionBtn.innerText = isRegisterMode ? "إنشاء حساب" : "دخول";
+        toggleAuth.innerText = isRegisterMode ? "لديك حساب؟ سجل دخول" : "جديد؟ سجل مجاناً";
+    };
+    
+    authActionBtn.onclick = async () => {
+        const email = authEmail.value.trim();
+        const pass = authPassword.value.trim();
+        if (!email || !pass) return showToast("📧 الرجاء ملء البريد وكلمة المرور", true);
+        if (isRegisterMode) {
+            const name = regNameField.value.trim();
+            if (!name) return showToast("✏️ أدخل اسمك", true);
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                await updateProfile(cred.user, { displayName: name });
+                await set(ref(db, `users/${cred.user.uid}`), { name, email });
+                showToast(`مرحباً ${name} 🚀`);
+            } catch (err) { showToast(err.message, true); }
         } else {
-            try{ await signInWithEmailAndPassword(auth,email,pass); } catch(e){ showToast("بيانات غير صحيحة"); }
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) { showToast("❌ بيانات دخول غير صحيحة", true); }
         }
     };
+    
     onAuthStateChanged(auth, async (user) => {
-        let urlParams = new URLSearchParams(window.location.search);
-        let siteId = urlParams.get("site");
-        if(siteId && (!user || user.uid !== siteId)) { /* عرض الموقع العام */
-            let snap = await get(ref(db, `sites/${siteId}/fullData`));
-            let data = snap.val() || {};
-            document.body.innerHTML = generateWebsiteHTML(data, siteId);
+        const urlParams = new URLSearchParams(window.location.search);
+        const publicSiteId = urlParams.get("site");
+        if (publicSiteId) {
+            const siteData = await get(ref(db, `sites/${publicSiteId}/components`));
+            const comps = siteData.val() || [];
+            let publicHtml = `<div style="max-width:1200px;margin:auto;padding:20px;background:#f5f7fb;"><div style="background:white;border-radius:32px;padding:24px;">`;
+            for (let c of comps) publicHtml += renderComponent(c, "#10b981");
+            publicHtml += `</div></div>`;
+            document.body.innerHTML = publicHtml;
             return;
         }
-        if(user){
+        if (user) {
             currentUser = user;
-            authScreenDiv.style.display = "none";
-            dashboardDiv.style.display = "flex";
-            document.getElementById("userNameDisplay").innerText = user.displayName;
-            await loadFullSiteData();
-            loadPages();
+            document.getElementById("authScreen").style.display = "none";
+            document.getElementById("dashboard").style.display = "flex";
+            document.getElementById("userNameDisplay").innerText = user.displayName || user.email;
+            await loadFromFirebase();
+            renderLayersPanel();
+            document.getElementById("undoBtn").onclick = undo;
+            document.getElementById("redoBtn").onclick = redo;
+            document.getElementById("publishBtn").onclick = () => {
+                const link = `${window.location.origin}${window.location.pathname}?site=${currentUser.uid}`;
+                navigator.clipboard.writeText(link);
+                showToast("✅ تم نسخ رابط موقعك المنشور!");
+            };
+            document.getElementById("previewBtn").onclick = () => window.open(`?site=${currentUser.uid}`, "_blank");
             document.getElementById("logoutBtn").onclick = async () => { await signOut(auth); location.reload(); };
+            // التحكم في القوائم الجانبية للأجهزة المحمولة
+            const mobileBtn = document.getElementById("mobileMenuBtn");
+            const structPanel = document.getElementById("structurePanel");
+            const overlay = document.getElementById("overlay");
+            if (mobileBtn) {
+                mobileBtn.onclick = () => { structPanel.classList.toggle("open"); overlay.classList.toggle("active"); };
+                overlay.onclick = () => { structPanel.classList.remove("open"); overlay.classList.remove("active"); };
+            }
+            document.getElementById("closeStructBtn").onclick = () => structPanel.classList.remove("open");
         } else {
-            if(!window.location.search.includes("site")) { authScreenDiv.style.display="flex"; dashboardDiv.style.display="none"; }
+            document.getElementById("authScreen").style.display = "flex";
+            document.getElementById("dashboard").style.display = "none";
         }
     });
-    
-    // زر القائمة للجوال
-    let menuBtn = document.createElement("button"); menuBtn.innerHTML = "<i class='fas fa-bars'></i>"; menuBtn.style.cssText = "background:var(--primary); margin-left:12px;"; let topBarDiv=document.querySelector(".top-bar"); if(topBarDiv && !document.querySelector(".mobile-toggle")){ menuBtn.classList.add("mobile-toggle"); topBarDiv.prepend(menuBtn); let side=document.getElementById("sidebar"); let overlayDiv=document.getElementById("overlay"); menuBtn.onclick=()=>{ side.classList.toggle("open"); overlayDiv.classList.toggle("active"); }; if(overlayDiv) overlayDiv.onclick=()=>{ side.classList.remove("open"); overlayDiv.classList.remove("active"); }; }
 </script>
 </body>
 </html>
