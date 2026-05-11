@@ -3,453 +3,941 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>WebStudio Engine | منصة متكاملة لبناء المواقع - جميع الطبقات</title>
+    <title>WebStudio Pro | المنصة المثالية لبناء المواقع</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
         :root {
-            --bg: #f5f7fb;
+            --bg: #f0f4f8;
             --surface: #ffffff;
-            --text: #1a2634;
-            --text-light: #5a6874;
+            --text: #0f172a;
+            --text-muted: #475569;
             --border: #e2e8f0;
             --primary: #10b981;
             --primary-dark: #059669;
-            --primary-light: #d1fae5;
+            --primary-glow: rgba(16, 185, 129, 0.3);
             --sidebar-width: 300px;
-            --inspector-width: 300px;
-            --toolbar-height: 60px;
+            --inspector-width: 340px;
         }
-        body { background: var(--bg); color: var(--text); overflow: hidden; font-size: 16px; }
-        
-        /* شاشة تسجيل الدخول */
-        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0b2b26, #1a4a3a); padding: 20px; }
-        .auth-card { background: var(--surface); border-radius: 48px; padding: 40px 32px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 30px 50px -20px rgba(0,0,0,0.3); }
-        .auth-card h2 { font-size: 28px; margin-bottom: 8px; background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .auth-card input { width: 100%; padding: 14px 18px; margin: 12px 0; border-radius: 60px; border: 1px solid var(--border); font-size: 16px; transition: 0.2s; }
-        .auth-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-        .auth-card button { background: var(--primary); color: white; width: 100%; padding: 14px; border-radius: 60px; font-weight: 700; font-size: 16px; cursor: pointer; border: none; transition: 0.2s; }
-        .auth-card button:hover { background: var(--primary-dark); transform: scale(0.98); }
-        .toggle-auth { color: var(--primary); margin-top: 20px; cursor: pointer; font-weight: 600; }
-        
-        /* لوحة التحكم الرئيسية */
-        .dashboard { display: none; flex-direction: column; height: 100vh; overflow: hidden; }
-        .toolbar { background: var(--surface); height: var(--toolbar-height); display: flex; justify-content: space-between; align-items: center; padding: 0 24px; border-bottom: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .toolbar-actions { display: flex; gap: 12px; }
-        .toolbar-btn { background: transparent; border: 1px solid var(--border); padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .toolbar-btn-primary { background: var(--primary); border: none; color: white; }
-        .toolbar-btn-primary:hover { background: var(--primary-dark); }
-        .user-info { display: flex; align-items: center; gap: 16px; }
-        
-        .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-        
-        /* اللوحة الجانبية (القائمة الشجرية للمكونات) */
-        .structure-panel { width: var(--sidebar-width); background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; transition: transform 0.3s ease; z-index: 20; }
-        .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 800; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); }
-        .category-group { margin-bottom: 24px; }
-        .category-title { font-weight: 700; padding: 8px 12px; background: var(--bg); border-radius: 16px; margin: 8px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .components-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; }
-        .component-chip { background: var(--bg); border-radius: 40px; padding: 8px 14px; font-size: 13px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
-        .component-chip:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
-        
-        /* منطقة المعاينة (Canvas) */
-        .canvas { flex: 1; overflow-y: auto; padding: 24px; background: #eef2f6; }
-        .site-preview { max-width: 1200px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15); overflow: hidden; transition: all 0.2s; }
-        .component-item { position: relative; margin-bottom: 20px; border: 2px solid transparent; border-radius: 24px; transition: 0.1s; cursor: pointer; }
-        .component-item.selected { border-color: var(--primary); background: #f0fdf4; }
-        .delete-component { position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; border-radius: 30px; padding: 4px 12px; font-size: 12px; cursor: pointer; z-index: 10; display: none; font-weight: bold; }
-        .component-item:hover .delete-component { display: block; }
-        
-        /* لوحة الخصائص */
-        .inspector-panel { width: var(--inspector-width); background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; transition: transform 0.3s ease; z-index: 20; }
-        .inspector-field { margin-bottom: 18px; }
-        .inspector-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-light); }
-        .inspector-field input, .inspector-field select, .inspector-field textarea { width: 100%; padding: 10px 14px; border-radius: 16px; border: 1px solid var(--border); font-size: 14px; }
-        
-        /* عناصر إضافية (ثري دي، فيديو) */
-        .three-canvas { width: 100%; height: 280px; background: #111; border-radius: 24px; }
-        .glass-effect { backdrop-filter: blur(12px); background: rgba(255,255,255,0.2); border-radius: 32px; }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 60px; z-index: 2000; font-size: 14px; animation: fadeUp 0.3s ease; }
-        
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* استجابة الجوال */
-        @media (max-width: 768px) {
-            .structure-panel { position: fixed; right: -100%; top: var(--toolbar-height); bottom: 0; z-index: 150; box-shadow: -5px 0 20px rgba(0,0,0,0.1); }
-            .structure-panel.open { right: 0; }
-            .inspector-panel { position: fixed; left: -100%; top: var(--toolbar-height); bottom: 0; z-index: 150; }
-            .inspector-panel.open { left: 0; }
-            .mobile-menu-btn { display: block; }
-            .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 140; }
-            .overlay.active { display: block; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
         }
-        .mobile-menu-btn { display: none; background: var(--primary); border: none; padding: 8px 12px; border-radius: 12px; color: white; cursor: pointer; }
+
+        /* auth screen */
+        .auth-container {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(145deg, #0b2b26, #1a4a3a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .auth-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 64px;
+            padding: 40px 32px;
+            width: 420px;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .auth-card h2 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #10b981, #047857);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 14px 20px;
+            margin: 12px 0;
+            border-radius: 60px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .auth-card input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .auth-card button {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+
+        .auth-card button:hover {
+            background: var(--primary-dark);
+            transform: scale(0.97);
+        }
+
+        .toggle-auth {
+            color: var(--primary);
+            margin-top: 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .demo-btn {
+            background: #1e293b;
+            margin-top: 16px;
+        }
+
+        .demo-btn:hover {
+            background: #0f172a;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--bg);
+        }
+
+        .toolbar {
+            background: var(--surface);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #047857);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .toolbar-btn-primary {
+            background: var(--primary);
+            border: none;
+            color: white;
+        }
+
+        .toolbar-btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .pages-tabs {
+            background: var(--surface);
+            padding: 10px 20px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-tab {
+            background: var(--bg);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .page-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .add-page {
+            background: var(--primary-light);
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Main layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Components library */
+        .components-panel {
+            width: var(--sidebar-width);
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            transition: 0.3s;
+            z-index: 20;
+        }
+
+        .components-category {
+            margin-bottom: 16px;
+        }
+
+        .category-title {
+            font-weight: 800;
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 20px;
+            margin: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .components-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 12px;
+        }
+
+        .comp-chip {
+            background: var(--bg);
+            border-radius: 40px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .comp-chip:hover {
+            border-color: var(--primary);
+            background: #d1fae5;
+            transform: translateY(-2px);
+        }
+
+        /* Canvas */
+        .canvas-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #e4e9f0;
+        }
+
+        .site-preview {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 40px -15px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .component-block {
+            position: relative;
+            margin: 20px;
+            border: 2px solid transparent;
+            border-radius: 28px;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+
+        .component-block.selected {
+            border-color: var(--primary);
+            background: #f0fdf4;
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .delete-comp-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #ef4444;
+            color: white;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            z-index: 15;
+        }
+
+        .component-block:hover .delete-comp-btn {
+            display: block;
+        }
+
+        /* Inspector */
+        .inspector {
+            width: var(--inspector-width);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .inspector-field {
+            margin-bottom: 18px;
+        }
+
+        .inspector-field label {
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .inspector-field input, .inspector-field select, .inspector-field textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        /* highlight animation */
+        .highlight-section {
+            border: 3px solid #10b981 !important;
+            box-shadow: 0 0 0 4px #10b98155, 0 0 25px #10b981 !important;
+            background: #ecfdf5;
+            transition: 0.2s;
+        }
+
+        .sidebar-trigger-fab {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: var(--primary);
+            width: 58px;
+            height: 58px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1100;
+            display: none;
+        }
+
+        .sidebar-drawer {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 340px;
+            background: white;
+            z-index: 1200;
+            padding: 24px;
+            overflow-y: auto;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-drawer.right {
+            right: 0;
+            transform: translateX(100%);
+        }
+
+        .sidebar-drawer.left {
+            left: 0;
+            transform: translateX(-100%);
+        }
+
+        .sidebar-drawer.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #eef2ff;
+            padding-bottom: 12px;
+        }
+
+        .sidebar-section-title {
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background: #f0fdf4;
+            padding-right: 8px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: 500;
+            animation: fadeInUp 0.3s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) translateX(-50%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateX(-50%);
+            }
+        }
+
+        @media (max-width: 800px) {
+            .components-panel {
+                position: fixed;
+                right: -100%;
+                top: 64px;
+                bottom: 0;
+                background: white;
+                z-index: 150;
+            }
+            .components-panel.open {
+                right: 0;
+            }
+            .inspector {
+                position: fixed;
+                left: -100%;
+                top: 64px;
+                bottom: 0;
+                z-index: 150;
+            }
+            .inspector.open {
+                left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 16px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
 
-<!-- شاشة المصادقة -->
+<!-- شاشة الدخول السلسة -->
 <div id="authScreen" class="auth-container">
     <div class="auth-card">
-        <i class="fas fa-cube" style="font-size: 56px; color: #10b981;"></i>
-        <h2>WebStudio Engine</h2>
-        <p style="color: #5a6874;">أنشئ مواقع احترافية بكل الطبقات مجاناً</p>
-        <input type="text" id="regName" placeholder="الاسم" style="display: none;">
-        <input type="email" id="authEmail" placeholder="البريد الإلكتروني" autocomplete="email">
-        <input type="password" id="authPassword" placeholder="كلمة المرور" autocomplete="current-password">
+        <i class="fas fa-crown" style="font-size: 60px; color: #10b981;"></i>
+        <h2>WebStudio Pro</h2>
+        <p style="margin-bottom: 20px;">منصة بناء المواقع الاحترافية | بدون تعقيد</p>
+        <input type="text" id="regName" placeholder="الاسم (للتسجيل)" style="display: none;">
+        <input type="text" id="authEmail" placeholder="البريد الإلكتروني أو اسم المستخدم">
+        <input type="password" id="authPassword" placeholder="كلمة المرور">
         <button id="authActionBtn">دخول</button>
-        <div class="toggle-auth" id="toggleAuthMode">✨ جديد؟ سجل مجاناً</div>
+        <div class="toggle-auth" id="toggleAuthMode">🆕 إنشاء حساب جديد</div>
+        <button id="demoBtn" class="demo-btn">🚀 دخول تجريبي فوري (بدون بيانات)</button>
     </div>
 </div>
 
-<!-- واجهة البناء الرئيسية -->
+<!-- لوحة التحكم الرئيسية -->
 <div id="dashboard" class="dashboard">
     <div class="toolbar">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; gap: 12px; align-items: center;">
             <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
-            <div class="logo">⚡ WebStudio Pro</div>
+            <div class="logo">⚡ WebStudio | محرر المستقبل</div>
         </div>
         <div class="toolbar-actions">
             <button class="toolbar-btn" id="undoBtn"><i class="fas fa-undo"></i> تراجع</button>
             <button class="toolbar-btn" id="redoBtn"><i class="fas fa-redo"></i> إعادة</button>
-            <button class="toolbar-btn toolbar-btn-primary" id="publishBtn"><i class="fas fa-globe"></i> نشر</button>
-            <button class="toolbar-btn" id="previewBtn"><i class="fas fa-eye"></i> معاينة</button>
+            <button class="toolbar-btn toolbar-btn-primary" id="exportBtn"><i class="fas fa-download"></i> تحميل HTML</button>
+            <button id="logoutBtn" class="toolbar-btn"><i class="fas fa-sign-out-alt"></i> خروج</button>
         </div>
-        <div class="user-info">
-            <span id="userNameDisplay"></span>
-            <button class="toolbar-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
-        </div>
+        <div class="user-info" id="userNameHeader"></div>
     </div>
+    <div class="pages-tabs" id="pagesTabs"></div>
     <div class="main-layout">
-        <div class="overlay" id="overlay"></div>
-        
-        <!-- اللوحة اليمنى: جميع المكونات وفق الطبقات (UI/MEDIA/INTERACTION/DATA/ADVANCED) -->
-        <div class="structure-panel" id="structurePanel">
-            <div class="panel-header">
-                <span><i class="fas fa-layer-group"></i> مكتبة الطبقات</span>
-                <button id="closeStructBtn" style="background:none; border:none; font-size: 20px;"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="layersContainer" style="padding: 12px;"></div>
+        <div id="componentsPanel" class="components-panel">
+            <div style="padding: 20px; font-weight: 800; border-bottom: 1px solid #eee;"><i class="fas fa-cubes"></i> مكتبة المكونات</div>
+            <div id="componentsList" style="padding: 12px;"></div>
         </div>
-        
-        <!-- المساحة الرئيسية (Canvas) -->
-        <div class="canvas" id="canvas">
-            <div class="site-preview" id="sitePreview"></div>
+        <div class="canvas-area" id="canvasArea">
+            <div class="site-preview" id="previewContainer"></div>
         </div>
-        
-        <!-- لوحة الخصائص -->
-        <div class="inspector-panel" id="inspectorPanel">
-            <h4 style="margin-bottom: 16px;"><i class="fas fa-sliders-h"></i> خصائص العنصر</h4>
-            <div id="inspectorContent">اختر أي عنصر في الموقع لتعديل خصائصه</div>
+        <div id="inspectorPanel" class="inspector">
+            <h4><i class="fas fa-magic"></i> الخصائص والتخصيص</h4>
+            <div id="inspectorContent">اختر أي عنصر أو القائمة الجانبية لتعديلها</div>
+            <button id="editSidebarGlobal" style="margin-top: 20px; background:#334155;" class="toolbar-btn">⚙️ إدارة القائمة الجانبية (Sidebar)</button>
         </div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDatabase, ref, set, get, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
-    
-    const firebaseConfig = {
-        apiKey: "AIzaSyDNCO9GaDIIRNVFn6PVCZWrsmCbLUxUZDA",
-        authDomain: "messaging-46900.firebaseapp.com",
-        databaseURL: "https://messaging-46900-default-rtdb.firebaseio.com",
-        projectId: "messaging-46900",
-        storageBucket: "messaging-46900.firebasestorage.app",
-        messagingSenderId: "659625864102",
-        appId: "1:659625864102:web:d194ab6528b69d5b2e7d67"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    
-    let currentUser = null;
-    let siteComponents = []; // كل عناصر الموقع { id, type, props }
-    let selectedCompId = null;
+<script>
+    // ---------- DATA MODEL ----------
+    let pages = [
+        { id: "home", name: "🏠 الرئيسية", components: [] }
+    ];
+    let currentPageId = "home";
     let historyStack = [];
-    let historyIndex = -1;
+    let historyPos = -1;
+    let selectedComponentId = null;
+    let isEditingSidebar = false;
     
-    // تعريف جميع المكونات حسب الطبقات (UI, Media, Interaction, Data, Advanced)
-    const COMPONENTS_LIB = {
-        "واجهات UI": [
-            { type: "hero", name: "🏠 الترحيب (Hero)", defaultProps: { title: "مرحباً بكم في موقعي", desc: "أفضل تجربة رقمية", btnText: "ابدأ الآن", btnLink: "#" } },
-            { type: "modernBtn", name: "✨ زر نيون/زجاجي", defaultProps: { text: "زر تفاعلي", style: "neon", link: "#" } },
-            { type: "navbar", name: "🧭 شريط تنقل ذكي", defaultProps: { logo: "شعارك", items: "الرئيسية,خدمات,اتصل بنا" } },
-            { type: "card", name: "💳 بطاقة منتج", defaultProps: { title: "منتج مميز", desc: "وصف رائع", price: "99", image: "https://picsum.photos/300/200" } },
-            { type: "modal", name: "🪟 نافذة منبثقة", defaultProps: { buttonText: "فتح النافذة", modalContent: "محتوى النافذة الحديثة" } },
-            { type: "slider", name: "🎠 سلايدر صور", defaultProps: { images: "https://picsum.photos/800/400?1,https://picsum.photos/800/400?2,https://picsum.photos/800/400?3" } }
-        ],
-        "وسائط Media": [
-            { type: "gallery", name: "🖼️ معرض صور (Masonry)", defaultProps: { images: "https://picsum.photos/300/200?1,https://picsum.photos/300/200?2,https://picsum.photos/300/200?3" } },
-            { type: "video", name: "🎬 مشغل فيديو", defaultProps: { videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", autoplay: false } },
-            { type: "audio", name: "🎵 مشغل صوتي", defaultProps: { audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" } },
-            { type: "threeD", name: "🧊 عارض 3D (Three.js)", defaultProps: { modelType: "cube" } },
-            { type: "canvasAnim", name: "✨ كانفاس متحرك", defaultProps: { animation: "particles" } }
-        ],
-        "تفاعل Interaction": [
-            { type: "hoverCard", name: "✨ بطاقة مؤثر hover", defaultProps: { content: "حرك المؤشر هنا", effect: "glow" } },
-            { type: "scrollReveal", name: "📜 أنيميشن سكرول", defaultProps: { title: "عنوان يظهر عند التمرير", animation: "fadeUp" } },
-            { type: "parallax", name: "🌄 بارالاكس خلفية", defaultProps: { title: "خلفية متحركة", bgImage: "https://picsum.photos/id/104/1200/600" } },
-            { type: "cursorFx", name: "🖱️ تأثير مؤشر فاخر", defaultProps: { effect: "glowTrail" } }
-        ],
-        "بيانات Data": [
-            { type: "form", name: "📝 نموذج اتصال", defaultProps: { fields: "الاسم,البريد,الرسالة" } },
-            { type: "liveChat", name: "💬 دردشة مباشرة (Realtime)", defaultProps: { room: "general" } },
-            { type: "comments", name: "🗣️ نظام تعليقات", defaultProps: { postId: "post1" } },
-            { type: "dashboard", name: "📊 لوحة إحصائيات", defaultProps: { visitors: "1250", sales: "5.2K", revenue: "12.8K" } }
-        ],
-        "أنظمة متقدمة": [
-            { type: "aiBot", name: "🤖 مساعد ذكاء اصطناعي (محاكي)", defaultProps: { botName: "مساعد WebStudio" } },
-            { type: "fileUpload", name: "📂 رفع ملفات سحابي", defaultProps: { accept: "image/*" } },
-            { type: "cms", name: "📰 نظام إدارة محتوى (مدونة)", defaultProps: { postsCount: "3" } },
-            { type: "realtimeCounter", name: "🔢 عداد مباشر (Live)", defaultProps: { count: 0 } }
+    // Sidebar configuration
+    let sidebarConfig = {
+        enabled: true,
+        mode: "overlay",
+        position: "right",
+        width: "340px",
+        backdrop: true,
+        blur: true,
+        triggerIcon: "fa-bars",
+        animation: "slide",
+        sections: [
+            { title: "التنقل السريع", items: [
+                { text: "الصفحة الرئيسية", icon: "fa-home", actionType: "openPage", target: "home" },
+                { text: "قسم الترحيب", icon: "fa-star", actionType: "scrollTo", target: "heroSection" }
+            ] },
+            { title: "روابط مهمة", items: [
+                { text: "جوجل", icon: "fa-google", actionType: "openLink", target: "https://google.com" },
+                { text: "يوتيوب", icon: "fa-youtube", actionType: "openLink", target: "https://youtube.com" }
+            ] }
         ]
     };
     
-    // دالة عرض الإشعارات
-    function showToast(msg, isErr = false) {
-        let toast = document.createElement("div");
-        toast.className = "toast";
-        toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2800);
+    // تعريف المكونات الغنية
+    const componentLibrary = {
+        "الأساسية": [
+            { type: "hero", name: "🎯 هيرو (قسم رئيسي)", defaultProps: { title: "مرحباً بك في WebStudio", desc: "ابني موقع أحلامك", btnText: "ابدأ الآن", btnLink: "#", sectionId: "heroSection" } },
+            { type: "card", name: "💳 بطاقة منتج عصرية", defaultProps: { title: "منتج مميز", desc: "وصف قصير", price: "$99", image: "https://picsum.photos/id/20/300/200", sectionId: "" } },
+            { type: "modernBtn", name: "✨ زر زجاجي (Glass)", defaultProps: { text: "زر تفاعلي", link: "#", glow: true } },
+            { type: "navbar", name: "📌 شريط تنقل", defaultProps: { logo: "شعارك", items: "الرئيسية,خدمات,اتصل بنا" } }
+        ],
+        "وسائط وتفاعل": [
+            { type: "videoBg", name: "🎬 فيديو خلفية", defaultProps: { videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", text: "مقطع فيديو" } },
+            { type: "gallery", name: "🖼️ معرض صور", defaultProps: { images: "https://picsum.photos/id/101/300/200,https://picsum.photos/id/104/300/200" } },
+            { type: "hover3d", name: "🌀 بطاقة 3D عند التمرير", defaultProps: { content: "حرك الماوس هنا", tilt: true } }
+        ]
+    };
+    
+    // Helper functions
+    function saveToLocal() {
+        localStorage.setItem("webstudio_pages", JSON.stringify(pages));
+        localStorage.setItem("webstudio_currentPage", currentPageId);
+        localStorage.setItem("webstudio_sidebar", JSON.stringify(sidebarConfig));
+        pushHistory();
     }
     
-    // حفظ التاريخ
-    function pushToHistory() {
-        historyStack = historyStack.slice(0, historyIndex + 1);
-        historyStack.push(JSON.parse(JSON.stringify(siteComponents)));
-        historyIndex++;
-        if (historyStack.length > 50) historyStack.shift();
-    }
-    function undo() { if (historyIndex > 0) { historyIndex--; siteComponents = JSON.parse(JSON.stringify(historyStack[historyIndex])); renderCanvas(); saveToFirebase(); showToast("تم التراجع"); } }
-    function redo() { if (historyIndex < historyStack.length - 1) { historyIndex++; siteComponents = JSON.parse(JSON.stringify(historyStack[historyIndex])); renderCanvas(); saveToFirebase(); showToast("تم الإعادة"); } }
-    
-    async function saveToFirebase() {
-        if (!currentUser) return;
-        await set(ref(db, `sites/${currentUser.uid}/components`), siteComponents);
-    }
-    
-    async function loadFromFirebase() {
-        if (!currentUser) return;
-        const snapshot = await get(ref(db, `sites/${currentUser.uid}/components`));
-        let comps = snapshot.val();
-        if (comps && Array.isArray(comps)) siteComponents = comps;
-        else siteComponents = [];
-        if (siteComponents.length === 0) addExampleComponents();
-        renderCanvas();
-        pushToHistory();
+    function loadFromLocal() {
+        let savedPages = localStorage.getItem("webstudio_pages");
+        let savedCurr = localStorage.getItem("webstudio_currentPage");
+        let savedSide = localStorage.getItem("webstudio_sidebar");
+        if (savedPages) pages = JSON.parse(savedPages);
+        if (savedCurr && pages.some(p=>p.id===savedCurr)) currentPageId = savedCurr;
+        else currentPageId = pages[0]?.id || "home";
+        if (savedSide) sidebarConfig = JSON.parse(savedSide);
+        if (pages.length === 0) pages = [{ id: "home", name: "الرئيسية", components: [] }];
+        addDemoComponentsOnce();
+        renderAll();
+        pushHistory();
     }
     
-    function addExampleComponents() {
-        siteComponents = [
-            { id: Date.now().toString(), type: "hero", props: { title: "مرحباً بك في WebStudio Pro", desc: "منصة متكاملة بكل الطبقات", btnText: "استكشف", btnLink: "#" } },
-            { id: (Date.now()+1).toString(), type: "card", props: { title: "منتج احترافي", desc: "جودة عالية", price: "199", image: "https://picsum.photos/300/200" } }
-        ];
+    function addDemoComponentsOnce() {
+        let homePage = pages.find(p => p.id === "home");
+        if (homePage && homePage.components.length === 0) {
+            homePage.components.push({ id: "comp1", type: "hero", props: { title: "ابدأ الآن مجاناً", desc: "جميع الأدوات التي تحتاجها", btnText: "استكشف", btnLink: "#", sectionId: "heroSection" } });
+            homePage.components.push({ id: "comp2", type: "card", props: { title: "تصميم حديث", desc: "واجهات جذابة", price: "مجاني", image: "https://picsum.photos/id/26/300/200", sectionId: "" } });
+        }
     }
     
-    // إضافة مكون جديد
+    function pushHistory() {
+        let state = JSON.parse(JSON.stringify({ pages, currentPageId, sidebarConfig }));
+        historyStack = historyStack.slice(0, historyPos + 1);
+        historyStack.push(state);
+        historyPos++;
+        if (historyStack.length > 40) historyStack.shift();
+    }
+    
+    function undo() { if (historyPos > 0) { historyPos--; applyState(historyStack[historyPos]); renderAll(); saveToLocal(); showToast("↩️ تراجع"); } }
+    function redo() { if (historyPos < historyStack.length-1) { historyPos++; applyState(historyStack[historyPos]); renderAll(); saveToLocal(); showToast("↪️ إعادة"); } }
+    function applyState(state) { pages = state.pages; currentPageId = state.currentPageId; sidebarConfig = state.sidebarConfig; }
+    
+    function showToast(msg) { let t = document.createElement("div"); t.className = "toast"; t.innerHTML = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2300); }
+    
+    // إضافة / حذف مكون
     function addComponent(compDef) {
-        const newId = Date.now() + "-" + Math.random().toString(36).substr(2, 6);
-        const newComp = { id: newId, type: compDef.type, props: JSON.parse(JSON.stringify(compDef.defaultProps)) };
-        siteComponents.push(newComp);
+        let page = pages.find(p=>p.id===currentPageId);
+        if (!page) return;
+        let newId = Date.now() + "-" + Math.random().toString(36).substr(2, 5);
+        let newComp = { id: newId, type: compDef.type, props: JSON.parse(JSON.stringify(compDef.defaultProps)) };
+        page.components.push(newComp);
         renderCanvas();
-        saveToFirebase();
-        pushToHistory();
-        showToast(`✅ تم إضافة ${compDef.name}`);
+        saveToLocal();
+        showToast(`➕ تم إضافة ${compDef.name}`);
     }
     
-    // حذف مكون
-    function deleteComponent(id) {
-        siteComponents = siteComponents.filter(c => c.id !== id);
-        if (selectedCompId === id) selectedCompId = null;
-        renderCanvas();
-        saveToFirebase();
-        pushToHistory();
-        showToast("🗑️ تم الحذف");
-    }
-    
-    // عرض قائمة الطبقات في اللوحة الجانبية
-    function renderLayersPanel() {
-        const container = document.getElementById("layersContainer");
-        container.innerHTML = "";
-        for (const [category, items] of Object.entries(COMPONENTS_LIB)) {
-            const catDiv = document.createElement("div");
-            catDiv.className = "category-group";
-            catDiv.innerHTML = `<div class="category-title"><span>📂 ${category}</span> <i class="fas fa-chevron-down"></i></div><div class="components-list" id="list-${category.replace(/\s/g,'')}"></div>`;
-            container.appendChild(catDiv);
-            const listDiv = catDiv.querySelector(".components-list");
-            items.forEach(item => {
-                const chip = document.createElement("div");
-                chip.className = "component-chip";
-                chip.innerHTML = `<i class="fas fa-plus-circle"></i> ${item.name}`;
-                chip.onclick = () => addComponent(item);
-                listDiv.appendChild(chip);
-            });
-            // تصغير/توسيع الأقسام
-            const titleDiv = catDiv.querySelector(".category-title");
-            titleDiv.onclick = () => {
-                const list = titleDiv.nextElementSibling;
-                list.style.display = list.style.display === "none" ? "flex" : "none";
-            };
+    function deleteComponent(compId) {
+        let page = pages.find(p=>p.id===currentPageId);
+        if (page) {
+            page.components = page.components.filter(c=>c.id!==compId);
+            if (selectedComponentId === compId) selectedComponentId = null;
+            renderCanvas();
+            saveToLocal();
+            showToast("🗑️ حذف العنصر");
         }
     }
     
-    // دالة لعرض مكونات معينة بناءً على النوع والخصائص
-    function renderComponent(comp, primaryColor = "#10b981") {
-        const p = comp.props;
-        switch (comp.type) {
-            case "hero": return `<div style="text-align:center; padding:60px 20px; background:linear-gradient(135deg, ${primaryColor}15, white); border-radius:32px;"><h1 style="color:${primaryColor}; font-size:2.2rem;">${p.title}</h1><p style="margin:12px 0;">${p.desc}</p><a href="${p.btnLink}" style="background:${primaryColor}; color:white; padding:12px 30px; border-radius:60px; text-decoration:none; display:inline-block;">${p.btnText}</a></div>`;
-            case "modernBtn": return `<a href="${p.link}" style="display:inline-block; padding:12px 32px; border-radius:60px; background:${p.style === 'neon' ? primaryColor : 'rgba(255,255,255,0.2)'}; backdrop-filter:blur(8px); box-shadow:0 0 10px ${primaryColor}; color:white; text-decoration:none;">${p.text}</a>`;
-            case "navbar": return `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background:rgba(255,255,255,0.9); backdrop-filter:blur(12px); border-radius:60px;"><strong style="color:${primaryColor};">${p.logo}</strong><div style="display:flex; gap:20px;">${p.items.split(',').map(i => `<span>${i.trim()}</span>`).join('')}</div></div>`;
-            case "card": return `<div style="background:white; border-radius:28px; padding:20px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.05); text-align:center;"><img src="${p.image}" style="width:100%; border-radius:20px; height:160px; object-fit:cover;"><h3 style="margin:12px 0 6px;">${p.title}</h3><p>${p.desc}</p><strong style="color:${primaryColor};">${p.price} ₪</strong><br><button style="background:${primaryColor}; border:none; border-radius:40px; padding:8px 24px; margin-top:12px; color:white;">شراء</button></div>`;
-            case "modal": return `<div><button id="modalBtn-${comp.id}" style="background:${primaryColor}; border:none; padding:10px 20px; border-radius:40px; color:white;">${p.buttonText}</button><div id="modalContent-${comp.id}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); justify-content:center; align-items:center; z-index:1000;"><div style="background:white; border-radius:32px; padding:30px; max-width:400px;">${p.modalContent}<button onclick="document.getElementById('modalContent-${comp.id}').style.display='none'">إغلاق</button></div></div><script>document.getElementById('modalBtn-${comp.id}')?.addEventListener('click',()=>document.getElementById('modalContent-${comp.id}').style.display='flex');<\/script></div>`;
-            case "slider": const imgs = p.images.split(','); return `<div style="display:flex; overflow-x:auto; gap:16px; padding:8px;">${imgs.map(src => `<img src="${src}" style="min-width:260px; height:180px; object-fit:cover; border-radius:24px;">`).join('')}</div>`;
-            case "gallery": const gallery = p.images.split(','); return `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;">${gallery.map(img => `<img src="${img}" style="width:100%; border-radius:20px; transition:0.2s; cursor:pointer;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">`).join('')}</div>`;
-            case "video": return `<video controls width="100%" style="border-radius:24px;" ${p.autoplay ? 'autoplay' : ''}><source src="${p.videoUrl}"></video>`;
-            case "audio": return `<audio controls src="${p.audioUrl}" style="width:100%;"></audio>`;
-            case "threeD": return `<div id="three-${comp.id}" class="three-canvas"></div><script>setTimeout(()=>{ const container=document.getElementById('three-${comp.id}'); if(container && !container.hasChildNodes()){ const scene=new THREE.Scene(); const camera=new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight,0.1,1000); const renderer=new THREE.WebGLRenderer(); renderer.setSize(container.clientWidth, container.clientHeight); container.appendChild(renderer.domElement); const geometry=new THREE.BoxGeometry(); const material=new THREE.MeshStandardMaterial({color:0x10b981}); const cube=new THREE.Mesh(geometry,material); scene.add(cube); const light=new THREE.DirectionalLight(0xffffff,1); light.position.set(1,2,3); scene.add(light); camera.position.z=3; function animate(){ requestAnimationFrame(animate); cube.rotation.x+=0.01; cube.rotation.y+=0.012; renderer.render(scene,camera); } animate(); } },100);<\/script>`;
-            case "hoverCard": return `<div style="padding:40px; text-align:center; background:#f0fdf4; border-radius:32px; transition:0.3s; cursor:pointer;" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 0 20px ${primaryColor}'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='none'">${p.content}</div>`;
-            case "scrollReveal": return `<div class="reveal-on-scroll" style="padding:50px; background:${primaryColor}15; border-radius:32px; opacity:0; transform:translateY(30px); transition:0.6s;">${p.title}</div><script>const observer=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.style.opacity=1; e.target.style.transform='translateY(0)'; } }); }); document.querySelectorAll('.reveal-on-scroll').forEach(el=>observer.observe(el));<\/script>`;
-            case "form": return `<form style="display:flex; flex-direction:column; gap:12px;"><input placeholder="الاسم"><input placeholder="البريد"><textarea placeholder="الرسالة"></textarea><button style="background:${primaryColor}; border:none; padding:10px; border-radius:40px; color:white;">إرسال</button></form>`;
-            case "liveChat": return `<div id="chat-${comp.id}" style="background:#f1f5f9; border-radius:24px; padding:12px; height:250px; overflow-y:auto;"><div>💬 مرحباً! دردشة تجريبية حية</div><input id="chatInput-${comp.id}" placeholder="اكتب رسالة..."><button onclick="alert('تم إرسال رسالة تجريبية')">إرسال</button></div>`;
-            case "dashboard": return `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;"><div style="background:#10b98120; border-radius:28px; padding:20px; text-align:center;"><h3>👥 زوار</h3><span style="font-size:28px;">${p.visitors}</span></div><div style="background:#10b98120; border-radius:28px; padding:20px;"><h3>💰 مبيعات</h3><span>${p.sales}</span></div><div><h3>📈 إيرادات</h3><span>${p.revenue}</span></div></div>`;
-            case "aiBot": return `<div style="background:#1e293b; border-radius:28px; color:white; padding:16px;"><div id="botMsgs-${comp.id}">🤖 مساعد: كيف يمكنني مساعدتك؟</div><input id="botInput-${comp.id}" placeholder="اكتب سؤالك"><button onclick="document.getElementById('botMsgs-${comp.id}').innerHTML+='<div>🗣️ أنت: '+document.getElementById('botInput-${comp.id}').value+'</div><div>🤖 رد تجريبي: شكراً لتواصلك</div>'">اسأل</button></div>`;
-            case "fileUpload": return `<input type="file" id="file-${comp.id}"><button onclick="alert('تم رفع الملف تجريبياً (سحابة Firebase)')">رفع</button><div>يمكنك إضافة صور عبر رابط في الخصائص</div>`;
-            default: return `<div style="background:#e2e8f0; border-radius:24px; padding:40px; text-align:center;">عنصر مخصص: ${comp.type}</div>`;
-        }
+    // Render component HTML (static)
+    function renderComponent(comp, isLive=true) {
+        let p = comp.props;
+        let sectionAttr = p.sectionId ? `data-section-id="${p.sectionId}"` : "";
+        if (comp.type === "hero") return `<div ${sectionAttr} style="background: linear-gradient(145deg, #eef2ff, white); padding: 70px 30px; text-align: center; border-radius: 48px;"><h1 style="color: #10b981;">${p.title}</h1><p style="margin: 12px 0;">${p.desc}</p><a href="${p.btnLink}" style="background:#10b981; color:white; padding:12px 32px; border-radius: 60px; display: inline-block; text-decoration: none;">${p.btnText}</a></div>`;
+        if (comp.type === "card") return `<div ${sectionAttr} style="background: white; border-radius: 32px; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);"><img src="${p.image}" style="width:100%; border-radius: 24px; height: 180px; object-fit: cover;"><h3 style="margin: 16px 0 8px;">${p.title}</h3><p>${p.desc}</p><strong style="color:#10b981;">${p.price}</strong><br><button style="background:#10b981; border:none; border-radius: 40px; padding: 8px 24px; color:white; margin-top: 12px;">شراء</button></div>`;
+        if (comp.type === "modernBtn") return `<a href="${p.link}" style="display: inline-block; background: rgba(16,185,129,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(16,185,129,0.5); padding: 12px 28px; border-radius: 60px; font-weight: bold; color:#10b981; text-decoration: none; transition: 0.2s;">${p.text}</a>`;
+        if (comp.type === "navbar") return `<div style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); padding: 12px 24px; border-radius: 80px;"><strong>${p.logo}</strong><div style="display: flex; gap: 24px;">${p.items.split(',').map(i=>`<span>${i.trim()}</span>`).join('')}</div></div>`;
+        if (comp.type === "videoBg") return `<div style="background: #000; border-radius: 32px; overflow: hidden;"><video controls width="100%" poster=""><source src="${p.videoUrl}"></video><p style="padding: 12px;">${p.text}</p></div>`;
+        if (comp.type === "gallery") { let imgs = p.images.split(','); return `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 12px;">${imgs.map(src=>`<img src="${src}" style="width:100%; border-radius: 24px; height: 140px; object-fit: cover;">`).join('')}</div>`; }
+        return `<div style="background:#f1f5f9; border-radius: 32px; padding: 32px;">مكون ${comp.type} متقدم</div>`;
     }
     
-    // عرض جميع المكونات في المعاينة
     function renderCanvas() {
-        const previewDiv = document.getElementById("sitePreview");
-        const primaryColor = "#10b981";
-        let html = `<div style="padding:24px;"><div style="margin-bottom:20px; text-align:center;"><span style="font-size:26px; font-weight:800; color:${primaryColor}">⚡ معاينة موقعك</span><p>انقر على أي عنصر لتعديل خصائصه</p></div>`;
-        for (let comp of siteComponents) {
-            html += `<div class="component-item" data-id="${comp.id}" data-type="${comp.type}"><div class="delete-component" data-id="${comp.id}"><i class="fas fa-trash"></i> حذف</div>${renderComponent(comp, primaryColor)}</div>`;
+        let page = pages.find(p=>p.id===currentPageId);
+        if (!page) return;
+        let html = `<div style="padding: 24px;"><div style="margin-bottom: 20px;"><h2>📄 ${page.name}</h2></div>`;
+        for (let comp of page.components) {
+            html += `<div class="component-block" data-id="${comp.id}"><div class="delete-comp-btn" data-id="${comp.id}"><i class="fas fa-trash"></i> حذف</div>${renderComponent(comp)}</div>`;
         }
         html += `</div>`;
-        previewDiv.innerHTML = html;
-        
-        // إضافة أحداث التحديد والحذف
-        document.querySelectorAll('.component-item').forEach(el => {
+        document.getElementById("previewContainer").innerHTML = html;
+        document.querySelectorAll('.component-block').forEach(el=> {
             el.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-component')) return;
-                const id = el.dataset.id;
-                selectedCompId = id;
-                document.querySelectorAll('.component-item').forEach(c => c.classList.remove('selected'));
+                if (e.target.classList.contains('delete-comp-btn')) return;
+                let id = el.dataset.id;
+                selectedComponentId = id;
+                isEditingSidebar = false;
+                document.querySelectorAll('.component-block').forEach(c=>c.classList.remove('selected'));
                 el.classList.add('selected');
                 renderInspector();
             });
-            const delBtn = el.querySelector('.delete-component');
+            let delBtn = el.querySelector('.delete-comp-btn');
             if (delBtn) delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteComponent(delBtn.dataset.id); });
         });
     }
     
-    // عرض لوحة الخصائص للعنصر المحدد
     function renderInspector() {
-        const container = document.getElementById("inspectorContent");
-        if (!selectedCompId) { container.innerHTML = "<p>✏️ اختر عنصراً من المعاينة لتعديل خصائصه</p>"; return; }
-        const comp = siteComponents.find(c => c.id === selectedCompId);
+        let container = document.getElementById("inspectorContent");
+        if (isEditingSidebar) {
+            container.innerHTML = `<h5><i class="fas fa-sliders-h"></i> تخصيص القائمة الجانبية</h5>
+            <div class="inspector-field"><label>الوضع</label><select id="sideMode">${["overlay","push","mini","floating"].map(m=>`<option ${sidebarConfig.mode===m?'selected':''}>${m}</option>`).join('')}</select></div>
+            <div class="inspector-field"><label>الجهة</label><select id="sidePos"><option ${sidebarConfig.position==='right'?'selected':''}>right</option><option ${sidebarConfig.position==='left'?'selected':''}>left</option></select></div>
+            <div class="inspector-field"><label>العرض</label><input id="sideWidth" value="${sidebarConfig.width}"></div>
+            <div class="inspector-field"><label>خلفية مظللة</label><input type="checkbox" id="sideBackdrop" ${sidebarConfig.backdrop?'checked':''}></div>
+            <div class="inspector-field"><label>أيقونة الزر</label><input id="sideIcon" value="${sidebarConfig.triggerIcon}"></div>
+            <hr><h6>أقسام القائمة</h6><div id="sectionsEditor"></div><button id="addSectionBtn" style="background:#10b981; color:white; border:none; padding: 8px; border-radius: 40px;">➕ إضافة قسم</button>`;
+            attachSidebarEditorEvents();
+            return;
+        }
+        if (!selectedComponentId) { container.innerHTML = `<p style="color:#666;">🔍 اختر عنصراً من المعاينة أو اضغط على "إدارة القائمة الجانبية"</p>`; return; }
+        let page = pages.find(p=>p.id===currentPageId);
+        let comp = page?.components.find(c=>c.id===selectedComponentId);
         if (!comp) return;
-        let html = `<h5 style="margin-bottom:12px;">تعديل: ${comp.type}</h5>`;
+        let html = `<h5>✏️ تحرير: ${comp.type}</h5>`;
         for (let [key, val] of Object.entries(comp.props)) {
             html += `<div class="inspector-field"><label>${key}</label><input type="text" data-prop="${key}" value="${val}"></div>`;
         }
         container.innerHTML = html;
-        document.querySelectorAll('#inspectorContent input').forEach(inp => {
-            inp.addEventListener('change', (e) => {
-                const prop = inp.dataset.prop;
+        document.querySelectorAll('#inspectorContent input[data-prop]').forEach(inp=>{
+            inp.addEventListener('change', (e)=>{
+                let prop = inp.dataset.prop;
                 comp.props[prop] = inp.value;
                 renderCanvas();
-                saveToFirebase();
-                pushToHistory();
+                saveToLocal();
             });
         });
     }
     
-    // ========== نظام المصادقة ==========
-    let isRegisterMode = false;
-    const authActionBtn = document.getElementById("authActionBtn");
-    const toggleAuth = document.getElementById("toggleAuthMode");
-    const regNameField = document.getElementById("regName");
-    const authEmail = document.getElementById("authEmail");
-    const authPassword = document.getElementById("authPassword");
-    
-    toggleAuth.onclick = () => {
-        isRegisterMode = !isRegisterMode;
-        regNameField.style.display = isRegisterMode ? "block" : "none";
-        authActionBtn.innerText = isRegisterMode ? "إنشاء حساب" : "دخول";
-        toggleAuth.innerText = isRegisterMode ? "لديك حساب؟ سجل دخول" : "جديد؟ سجل مجاناً";
-    };
-    
-    authActionBtn.onclick = async () => {
-        const email = authEmail.value.trim();
-        const pass = authPassword.value.trim();
-        if (!email || !pass) return showToast("📧 الرجاء ملء البريد وكلمة المرور", true);
-        if (isRegisterMode) {
-            const name = regNameField.value.trim();
-            if (!name) return showToast("✏️ أدخل اسمك", true);
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(cred.user, { displayName: name });
-                await set(ref(db, `users/${cred.user.uid}`), { name, email });
-                showToast(`مرحباً ${name} 🚀`);
-            } catch (err) { showToast(err.message, true); }
-        } else {
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (err) { showToast("❌ بيانات دخول غير صحيحة", true); }
+    function attachSidebarEditorEvents() {
+        document.getElementById("sideMode")?.addEventListener("change", e=> { sidebarConfig.mode = e.target.value; renderSidebarUI(); saveToLocal(); });
+        document.getElementById("sidePos")?.addEventListener("change", e=> { sidebarConfig.position = e.target.value; renderSidebarUI(); saveToLocal(); });
+        document.getElementById("sideWidth")?.addEventListener("change", e=> { sidebarConfig.width = e.target.value; renderSidebarUI(); });
+        document.getElementById("sideBackdrop")?.addEventListener("change", e=> { sidebarConfig.backdrop = e.target.checked; renderSidebarUI(); });
+        document.getElementById("sideIcon")?.addEventListener("change", e=> { sidebarConfig.triggerIcon = e.target.value; renderSidebarUI(); });
+        function renderSectionsEditor() {
+            let div = document.getElementById("sectionsEditor");
+            if (!div) return;
+            div.innerHTML = sidebarConfig.sections.map((sec, idx)=> `<div style="border:1px solid #e2e8f0; margin: 12px 0; padding: 12px; border-radius: 24px;"><input placeholder="عنوان القسم" value="${sec.title}" data-sec="${idx}" class="secTitle"><div id="itemsSec${idx}">${sec.items.map((it, iidx)=> `<div style="display: flex; gap: 8px; margin: 8px 0;"><input placeholder="نص" value="${it.text}" class="itemText" data-sec="${idx}" data-item="${iidx}"><input placeholder="أيقونة" value="${it.icon}" class="itemIcon" data-sec="${idx}" data-item="${iidx}"><select class="itemAction" data-sec="${idx}" data-item="${iidx}"><option ${it.actionType==='scrollTo'?'selected':''}>scrollTo</option><option ${it.actionType==='openPage'?'selected':''}>openPage</option><option ${it.actionType==='openLink'?'selected':''}>openLink</option><option ${it.actionType==='openModal'?'selected':''}>openModal</option></select><input placeholder="target" value="${it.target}" class="itemTarget" data-sec="${idx}" data-item="${iidx}"><button class="delItem" data-sec="${idx}" data-item="${iidx}">🗑️</button></div>`).join('')}<button class="addItemToSec" data-sec="${idx}">+ عنصر</button><button class="delSec" data-sec="${idx}" style="background:#ef4444; margin-top: 8px;">حذف القسم</button></div>`).join('');
+            attachEventsToDynamic();
         }
-    };
-    
-    onAuthStateChanged(auth, async (user) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const publicSiteId = urlParams.get("site");
-        if (publicSiteId) {
-            const siteData = await get(ref(db, `sites/${publicSiteId}/components`));
-            const comps = siteData.val() || [];
-            let publicHtml = `<div style="max-width:1200px;margin:auto;padding:20px;background:#f5f7fb;"><div style="background:white;border-radius:32px;padding:24px;">`;
-            for (let c of comps) publicHtml += renderComponent(c, "#10b981");
-            publicHtml += `</div></div>`;
-            document.body.innerHTML = publicHtml;
-            return;
+        function attachEventsToDynamic() {
+            document.querySelectorAll(".secTitle").forEach(inp=> inp.addEventListener("change", e=> { let idx = inp.dataset.sec; sidebarConfig.sections[idx].title = inp.value; saveToLocal(); }));
+            document.querySelectorAll(".itemText, .itemIcon, .itemTarget").forEach(inp=> inp.addEventListener("change", e=> { let sec = inp.dataset.sec; let itm = inp.dataset.item; let field = inp.classList.contains("itemText")?"text":(inp.classList.contains("itemIcon")?"icon":"target"); sidebarConfig.sections[sec].items[itm][field] = inp.value; saveToLocal(); }));
+            document.querySelectorAll(".itemAction").forEach(sel=> sel.addEventListener("change", e=> { let sec = sel.dataset.sec; let itm = sel.dataset.item; sidebarConfig.sections[sec].items[itm].actionType = sel.value; saveToLocal(); }));
+            document.querySelectorAll(".addItemToSec").forEach(btn=> btn.addEventListener("click", e=> { let sec = btn.dataset.sec; sidebarConfig.sections[sec].items.push({ text:"رابط جديد", icon:"fa-link", actionType:"openLink", target:"https://example.com" }); saveToLocal(); renderSectionsEditor(); }));
+            document.querySelectorAll(".delItem").forEach(btn=> btn.addEventListener("click", e=> { let sec = btn.dataset.sec; let itm = btn.dataset.item; sidebarConfig.sections[sec].items.splice(itm,1); saveToLocal(); renderSectionsEditor(); }));
+            document.querySelectorAll(".delSec").forEach(btn=> btn.addEventListener("click", e=> { let sec = btn.dataset.sec; sidebarConfig.sections.splice(sec,1); saveToLocal(); renderSectionsEditor(); }));
         }
-        if (user) {
-            currentUser = user;
-            document.getElementById("authScreen").style.display = "none";
-            document.getElementById("dashboard").style.display = "flex";
-            document.getElementById("userNameDisplay").innerText = user.displayName || user.email;
-            await loadFromFirebase();
-            renderLayersPanel();
-            document.getElementById("undoBtn").onclick = undo;
-            document.getElementById("redoBtn").onclick = redo;
-            document.getElementById("publishBtn").onclick = () => {
-                const link = `${window.location.origin}${window.location.pathname}?site=${currentUser.uid}`;
-                navigator.clipboard.writeText(link);
-                showToast("✅ تم نسخ رابط موقعك المنشور!");
-            };
-            document.getElementById("previewBtn").onclick = () => window.open(`?site=${currentUser.uid}`, "_blank");
-            document.getElementById("logoutBtn").onclick = async () => { await signOut(auth); location.reload(); };
-            // التحكم في القوائم الجانبية للأجهزة المحمولة
-            const mobileBtn = document.getElementById("mobileMenuBtn");
-            const structPanel = document.getElementById("structurePanel");
-            const overlay = document.getElementById("overlay");
-            if (mobileBtn) {
-                mobileBtn.onclick = () => { structPanel.classList.toggle("open"); overlay.classList.toggle("active"); };
-                overlay.onclick = () => { structPanel.classList.remove("open"); overlay.classList.remove("active"); };
+        renderSectionsEditor();
+        document.getElementById("addSectionBtn")?.addEventListener("click", ()=>{ sidebarConfig.sections.push({ title:"قسم جديد", items:[{ text:"رابط تجريبي", icon:"fa-globe", actionType:"openLink", target:"https://example.com" }] }); saveToLocal(); renderSectionsEditor(); });
+    }
+    
+    // Sidebar live UI (FAB + drawer)
+    let sidebarRendered = false;
+    function renderSidebarUI() {
+        let oldTrigger = document.querySelector(".sidebar-trigger-fab");
+        let oldOverlay = document.querySelector(".sidebar-overlay");
+        let oldDrawer = document.querySelector(".sidebar-drawer");
+        if (oldTrigger) oldTrigger.remove();
+        if (oldOverlay) oldOverlay.remove();
+        if (oldDrawer) oldDrawer.remove();
+        if (!sidebarConfig.enabled) return;
+        let fab = document.createElement("div");
+        fab.className = "sidebar-trigger-fab";
+        fab.innerHTML = `<i class="fas ${sidebarConfig.triggerIcon}"></i>`;
+        document.body.appendChild(fab);
+        let overlay = document.createElement("div");
+        overlay.className = "sidebar-overlay";
+        if (sidebarConfig.backdrop) overlay.style.display = "none";
+        if (sidebarConfig.blur) overlay.style.backdropFilter = "blur(8px)";
+        document.body.appendChild(overlay);
+        let drawer = document.createElement("div");
+        drawer.className = `sidebar-drawer ${sidebarConfig.position}`;
+        drawer.style.width = sidebarConfig.width;
+        let drawerHtml = `<div style="display: flex; justify-content: space-between;"><h3><i class="fas fa-bars"></i> القائمة</h3><i class="fas fa-times closeDrawer" style="cursor:pointer;"></i></div>`;
+        for (let sec of sidebarConfig.sections) {
+            drawerHtml += `<div class="sidebar-section"><div class="sidebar-section-title"><span>${sec.title}</span> <i class="fas fa-chevron-down"></i></div><div>`;
+            for (let it of sec.items) {
+                drawerHtml += `<div class="sidebar-item" data-action="${it.actionType}" data-target="${it.target}"><i class="fas ${it.icon}"></i> ${it.text}</div>`;
             }
-            document.getElementById("closeStructBtn").onclick = () => structPanel.classList.remove("open");
-        } else {
-            document.getElementById("authScreen").style.display = "flex";
-            document.getElementById("dashboard").style.display = "none";
+            drawerHtml += `</div></div>`;
         }
-    });
+        drawer.innerHTML = drawerHtml;
+        document.body.appendChild(drawer);
+        let closeBtn = drawer.querySelector(".closeDrawer");
+        function openSidebar() { drawer.classList.add("open"); if (sidebarConfig.backdrop) overlay.style.display = "block"; if (sidebarConfig.animation === "slide") gsap.fromTo(drawer, { opacity:0, x: sidebarConfig.position==="right"?50:-50 }, { opacity:1, x:0, duration:0.3 }); }
+        function closeSidebar() { drawer.classList.remove("open"); overlay.style.display = "none"; }
+        fab.onclick = openSidebar;
+        closeBtn.onclick = closeSidebar;
+        overlay.onclick = closeSidebar;
+        drawer.querySelectorAll(".sidebar-item").forEach(item => {
+            item.addEventListener("click", (e) => {
+                let action = item.dataset.action;
+                let target = item.dataset.target;
+                executeGlobalAction(action, target);
+                if (sidebarConfig.mode !== "push") closeSidebar();
+            });
+        });
+    }
+    
+    function executeGlobalAction(action, target) {
+        if (action === "scrollTo") {
+            let el = document.querySelector(`[data-section-id="${target}"]`);
+            if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); el.classList.add("highlight-section"); setTimeout(()=>el.classList.remove("highlight-section"), 1500); showToast(`↘️ انتقل إلى ${target}`); }
+            else showToast("⚠️ القسم غير موجود");
+        } else if (action === "openPage") {
+            let pageExists = pages.find(p=>p.id===target || p.name===target);
+            if (pageExists) { currentPageId = pageExists.id; renderCanvas(); renderPagesTabs(); saveToLocal(); showToast(`📄 انتقل إلى ${pageExists.name}`); }
+            else showToast("الصفحة غير موجودة");
+        } else if (action === "openLink") { window.open(target, "_blank"); }
+        else if (action === "openModal") { alert("🚀 نافذة منبثقة: " + target); }
+        else showToast("تم تنفيذ الأمر");
+    }
+    
+    function renderPagesTabs() {
+        let container = document.getElementById("pagesTabs");
+        container.innerHTML = `<div style="display: flex; gap: 10px; flex-wrap: wrap;">${pages.map(p=> `<div class="page-tab ${p.id===currentPageId?'active':''}" data-id="${p.id}"><span>${p.name}</span> <i class="fas fa-pen" data-edit="${p.id}" style="font-size:12px;"></i> <i class="fas fa-trash" data-del="${p.id}" style="color:red; font-size:12px;"></i></div>`).join('')}<button class="add-page" id="newPageBtn">+ صفحة جديدة</button></div>`;
+        document.querySelectorAll('.page-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => { if(e.target.classList.contains('fa-pen') || e.target.classList.contains('fa-trash')) return; let id = tab.dataset.id; if(id) { currentPageId = id; renderCanvas(); renderPagesTabs(); saveToLocal(); } });
+            let editIcon = tab.querySelector('.fa-pen'); if(editIcon) editIcon.addEventListener('click', (e)=>{ e.stopPropagation(); let id = editIcon.dataset.edit; let newName = prompt("اسم الصفحة", pages.find(p=>p.id===id).name); if(newName) { pages.find(p=>p.id===id).name = newName; renderPagesTabs(); saveToLocal(); } });
+            let delIcon = tab.querySelector('.fa-trash'); if(delIcon) delIcon.addEventListener('click', (e)=>{ e.stopPropagation(); let id = delIcon.dataset.del; if(pages.length===1) { showToast("لا يمكن حذف الصفحة الوحيدة", true); return; } pages = pages.filter(p=>p.id!==id); if(currentPageId===id) currentPageId = pages[0].id; renderAll(); saveToLocal(); });
+        });
+        document.getElementById("newPageBtn")?.addEventListener("click", ()=>{ let newId = Date.now().toString(); pages.push({ id: newId, name: "صفحة جديدة", components: [] }); currentPageId = newId; renderAll(); saveToLocal(); });
+    }
+    
+    function renderComponentsLibrary() {
+        let div = document.getElementById("componentsList");
+        div.innerHTML = "";
+        for (let [cat, items] of Object.entries(componentLibrary)) {
+            let catDiv = document.createElement("div");
+            catDiv.className = "components-category";
+            catDiv.innerHTML = `<div class="category-title"><span>📁 ${cat}</span> <i class="fas fa-chevron-down"></i></div><div class="components-grid" id="grid-${cat.replace(/\s/g,'')}"></div>`;
+            div.appendChild(catDiv);
+            let grid = catDiv.querySelector(".components-grid");
+            items.forEach(item => {
+                let chip = document.createElement("div");
+                chip.className = "comp-chip";
+                chip.innerHTML = `<i class="fas fa-plus-circle"></i> ${item.name}`;
+                chip.onclick = () => addComponent(item);
+                grid.appendChild(chip);
+            });
+            catDiv.querySelector(".category-title").onclick = () => { let g = catDiv.querySelector(".components-grid"); g.style.display = g.style.display === "none" ? "flex" : "none"; };
+        }
+    }
+    
+    function renderAll() { renderPagesTabs(); renderCanvas(); renderComponentsLibrary(); renderSidebarUI(); renderInspector(); }
+    
+    // EXPORT AS HTML FILE
+    function exportFullWebsite() {
+        let allPagesData = pages;
+        let currentSide = sidebarConfig;
+        let exportHtml = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>WebStudio_Exported</title><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"><\/script><style> *{margin:0;padding:0;box-sizing:border-box;font-family:Cairo;} body{background:#f1f5f9; padding:20px;} .container{max-width:1300px; margin:auto; background:white; border-radius:32px; overflow:hidden;} .pages-tabs{display:flex; gap:10px; padding:20px; background:white;} .page-tab{background:#e2e8f0; padding:6px 18px; border-radius:40px; cursor:pointer;} .page-tab.active{background:#10b981; color:white;} .sidebar-trigger-fab{position:fixed; bottom:20px; right:20px; background:#10b981; width:56px; height:56px; border-radius:30px; display:flex; align-items:center; justify-content:center; color:white; font-size:28px; cursor:pointer; z-index:1000;} .sidebar-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); z-index:1100; display:none;} .sidebar-drawer{position:fixed; top:0; bottom:0; width:${currentSide.width}; background:white; z-index:1200; padding:20px; overflow-y:auto; transition:0.3s;} .sidebar-drawer.right{right:0; transform:translateX(100%);} .sidebar-drawer.left{left:0; transform:translateX(-100%);} .sidebar-drawer.open{transform:translateX(0);} .sidebar-item{display:flex; gap:12px; padding:10px; cursor:pointer;} .highlight-section{border:2px solid #10b981; box-shadow:0 0 15px #10b981;}<\/style></head><body><div class="container"><div class="pages-tabs" id="exportTabs"></div><div id="exportPages"></div></div><script> const pagesData = ${JSON.stringify(allPagesData)}; let currentPageId = "${currentPageId}"; function renderComponentExp(c){ let p=c.props; if(c.type==="hero") return \`<div data-section-id="\${p.sectionId||''}" style="padding:60px 20px; text-align:center;"><h1>\${p.title}</h1><p>\${p.desc}</p><a href="\${p.btnLink}" style="background:#10b981; padding:12px 30px; border-radius:60px; color:white; text-decoration:none;">\${p.btnText}</a></div>\`; if(c.type==="card") return \`<div style="padding:20px;"><img src="\${p.image}" style="width:100%; border-radius:24px;"><h3>\${p.title}</h3><p>\${p.desc}</p><strong>\${p.price}</strong></div>\`; return \`<div>\${c.type}<\/div>\`; } function renderAllExp(){ let tabsHtml=pagesData.map(p=>\`<div class="page-tab \${p.id===currentPageId?'active':''}" data-id="\${p.id}">\${p.name}<\/div>\`).join(''); document.getElementById('exportTabs').innerHTML=tabsHtml; let pagesHtml=pagesData.map(p=>\`<div class="page-container" data-page-id="\${p.id}" style="display:\${p.id===currentPageId?'block':'none'}">\${p.components.map(c=>renderComponentExp(c)).join('')}<\/div>\`).join(''); document.getElementById('exportPages').innerHTML=pagesHtml; document.querySelectorAll('.page-tab').forEach(t=>{ t.addEventListener('click',()=>{ let id=t.dataset.id; document.querySelectorAll('.page-container').forEach(div=>div.style.display='none'); document.querySelector(\`.page-container[data-page-id="\${id}"]\`).style.display='block'; currentPageId=id; renderAllExp(); }); }); } renderAllExp(); const sidebarConf = ${JSON.stringify(currentSide)}; (function buildSidebar(){ if(!sidebarConf.enabled) return; let fab=document.createElement('div'); fab.className='sidebar-trigger-fab'; fab.innerHTML='<i class="fas '+sidebarConf.triggerIcon+'"></i>'; document.body.appendChild(fab); let overlay=document.createElement('div'); overlay.className='sidebar-overlay'; document.body.appendChild(overlay); let drawer=document.createElement('div'); drawer.className='sidebar-drawer '+sidebarConf.position; drawer.style.width=sidebarConf.width; let htmlDrawer='<div><i class="fas fa-times closeDrawer" style="float:left;cursor:pointer;"></i><h3>القائمة</h3></div>'; for(let sec of sidebarConf.sections){ htmlDrawer+='<div><h4>'+sec.title+'</h4>'; for(let it of sec.items) htmlDrawer+='<div class="sidebar-item" data-action="'+it.actionType+'" data-target="'+it.target+'"><i class="fas '+it.icon+'"></i> '+it.text+'</div>'; htmlDrawer+='</div>'; } drawer.innerHTML=htmlDrawer; document.body.appendChild(drawer); let close=drawer.querySelector('.closeDrawer'); function openDrawer(){drawer.classList.add('open'); if(sidebarConf.backdrop) overlay.style.display='block';} function closeDrawer(){drawer.classList.remove('open'); overlay.style.display='none';} fab.onclick=openDrawer; close.onclick=closeDrawer; overlay.onclick=closeDrawer; drawer.querySelectorAll('.sidebar-item').forEach(el=>{ el.addEventListener('click',()=>{ let act=el.dataset.action; let tar=el.dataset.target; if(act==='scrollTo'){ let elem=document.querySelector('[data-section-id="'+tar+'"]'); if(elem){ elem.scrollIntoView({behavior:'smooth'}); elem.classList.add('highlight-section'); setTimeout(()=>elem.classList.remove('highlight-section'),1500); } } else if(act==='openPage'){ let pg=pagesData.find(p=>p.id===tar); if(pg){ document.querySelectorAll('.page-container').forEach(div=>div.style.display='none'); document.querySelector('.page-container[data-page-id="'+pg.id+'"]').style.display='block'; currentPageId=pg.id; renderAllExp(); } } else if(act==='openLink') window.open(tar,'_blank'); else alert('action: '+act); if(sidebarConf.mode !=='push') closeDrawer(); }); }); })(); <\/script></body></html>`;
+        let blob = new Blob([exportHtml], {type: "text/html"});
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "webstudio_site_ideal.html";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast("✅ تم تصدير الموقع كملف HTML شامل");
+    }
+    
+    // ---------- AUTH (Local Demo & Fake accounts) ----------
+    let authMode = "login"; // login / register
+    const authScreenDiv = document.getElementById("authScreen");
+    const dashboardDiv = document.getElementById("dashboard");
+    const regNameInput = document.getElementById("regName");
+    const authEmailInput = document.getElementById("authEmail");
+    const authPassInput = document.getElementById("authPassword");
+    const authBtn = document.getElementById("authActionBtn");
+    const toggleAuthBtn = document.getElementById("toggleAuthMode");
+    const demoBtnAuth = document.getElementById("demoBtn");
+    
+    function startAppWithUser(name) {
+        document.getElementById("userNameHeader").innerHTML = `<i class="fas fa-user-circle"></i> ${name}`;
+        authScreenDiv.style.display = "none";
+        dashboardDiv.style.display = "flex";
+        loadFromLocal();
+    }
+    
+    function fakeLoginOrRegister(isRegister) {
+        let email = authEmailInput.value.trim();
+        let pass = authPassInput.value.trim();
+        let name = regNameInput.value.trim();
+        if (!email || !pass) { showToast("املأ البريد وكلمة المرور", true); return; }
+        if (isRegister && !name) { showToast("أدخل اسمك للتسجيل", true); return; }
+        // محاكاة ناجحة
+        let displayName = isRegister ? name : email.split('@')[0];
+        localStorage.setItem("webstudio_user", JSON.stringify({ name: displayName, email }));
+        startAppWithUser(displayName);
+    }
+    
+    authBtn.onclick = () => {
+        if (authMode === "login") fakeLoginOrRegister(false);
+        else fakeLoginOrRegister(true);
+    };
+    toggleAuthBtn.onclick = () => {
+        authMode = authMode === "login" ? "register" : "login";
+        regNameInput.style.display = authMode === "register" ? "block" : "none";
+        authBtn.innerText = authMode === "register" ? "إنشاء حساب" : "دخول";
+        toggleAuthBtn.innerText = authMode === "register" ? "لديك حساب؟ سجل دخول" : "جديد؟ سجل مجاناً";
+    };
+    demoBtnAuth.onclick = () => {
+        let demoName = "مستخدم تجريبي ✨";
+        localStorage.setItem("webstudio_user", JSON.stringify({ name: demoName, email: "demo@webstudio.com" }));
+        startAppWithUser(demoName);
+    };
+    // check local user
+    let storedUser = localStorage.getItem("webstudio_user");
+    if (storedUser) {
+        let user = JSON.parse(storedUser);
+        startAppWithUser(user.name);
+    } else {
+        authScreenDiv.style.display = "flex";
+        dashboardDiv.style.display = "none";
+    }
+    
+    document.getElementById("undoBtn")?.addEventListener("click", undo);
+    document.getElementById("redoBtn")?.addEventListener("click", redo);
+    document.getElementById("exportBtn")?.addEventListener("click", exportFullWebsite);
+    document.getElementById("logoutBtn")?.addEventListener("click", ()=>{ localStorage.removeItem("webstudio_user"); location.reload(); });
+    document.getElementById("editSidebarGlobal")?.addEventListener("click", ()=>{ isEditingSidebar = true; selectedComponentId = null; renderInspector(); });
+    // mobile toggle
+    document.getElementById("mobileMenuBtn")?.addEventListener("click", ()=>document.getElementById("componentsPanel")?.classList.toggle("open"));
 </script>
 </body>
 </html>
